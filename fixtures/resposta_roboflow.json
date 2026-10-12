@@ -1,0 +1,15 @@
+{
+  "inference_id": "25de82f3-ae95-4928-921b-50d0540c9dcf",
+  "time": 0.005276764743030071,
+  "resolved_model": {
+    "model_id": "tools-classification-byznk/2",
+    "model_package_id": "7ee34fce76456d9ff4cfe6e7049aad1e",
+    "backend": "onnx",
+    "quantization": "fp32"
+  },
+  "image": {
+    "width": 447,
+    "height": 447
+  },
+  "predictions": []
+}

@@ -1,0 +1,18 @@
+{
+  "model_id": "tools-classification-byznk/2",
+  "api_url": "https://serverless.roboflow.com",
+  "limiar_confianca": 0.5,
+  "classes_ignoradas": ["Fasteners"],
+  "de_para": {
+    "FER-001": "Pliers",
+    "FER-002": "Screwdriver",
+    "FER-003": "Wrench",
+    "FER-004": "Hammer"
+  },
+  "nomes_exibicao": {
+    "Pliers": "Alicate",
+    "Screwdriver": "Chave de fenda",
+    "Wrench": "Chave inglesa",
+    "Hammer": "Martelo"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "inference_id": "03d08450-dbc8-4921-ad71-fec578e5d741",
+  "time": 0.0061098248697817326,
+  "resolved_model": {
+    "model_id": "tools-classification-byznk/2",
+    "model_package_id": "7ee34fce76456d9ff4cfe6e7049aad1e",
+    "backend": "onnx",
+    "quantization": "fp32"
+  },
+  "image": {
+    "width": 447,
+    "height": 447
+  },
+  "predictions": [
+    {
+      "x": 180.5,
+      "y": 232.0,
+      "width": 59.0,
+      "height": 414.0,
+      "confidence": 0.30481666326522827,
+      "class": "Hammer",
+      "class_id": 1,
+      "detection_id": "2365c594-dea3-40a1-9a76-4ebb068d832d"
+    },
+    {
+      "x": 226.5,
+      "y": 250.0,
+      "width": 39.0,
+      "height": 370.0,
+      "confidence": 0.26152539253234863,
+      "class": "Hammer",
+      "class_id": 1,
+      "detection_id": "851f3816-7c10-41bf-9b05-4a07b87f4fa0"
+    },
+    {
+      "x": 317.5,
+      "y": 236.5,
+      "width": 73.0,
+      "height": 393.0,
+      "confidence": 0.20464926958084106,
+      "class": "Hammer",
+      "class_id": 1,
+      "detection_id": "38dc04a2-72a8-4b01-8c29-f2f9247644d1"
+    },
+    {
+      "x": 115.5,
+      "y": 285.5,
+      "width": 41.0,
+      "height": 299.0,
+      "confidence": 0.16224956512451172,
+      "class": "Hammer",
+      "class_id": 1,
+      "detection_id": "059de00e-fe80-43c7-b2b3-709c03bb03c6"
+    }
+  ]
+}
