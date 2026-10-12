@@ -1,0 +1,21 @@
+{
+  "nota_id": "NF-DEMO-002",
+  "imagem": "imagens/teste/Img 16.jpg",
+  "status": "divergente",
+  "linhas": [
+    {
+      "codigo": "FER-003",
+      "item": "Chave inglesa",
+      "classe": "Wrench",
+      "esperado": 2,
+      "detectado": 1,
+      "delta": -1,
+      "situacao": "falta"
+    }
+  ],
+  "descartadas": [],
+  "avisos": [],
+  "modelo_id": "tools-classification-byznk/2",
+  "limiar_confianca": 0.5,
+  "gerado_em": "2026-10-12T01:49:34-03:00"
+}
