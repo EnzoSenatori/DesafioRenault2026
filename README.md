@@ -79,7 +79,7 @@ relatorio, pasta = conferir("foto.jpg", "nota.json")
 print(relatorio["status"])
 ```
 
-Para um quadro já em memória (array BGR do OpenCV, por exemplo de uma câmera), use `conferir_quadro(imagem_bgr, nota, config)`. Ela devolve o relatório e a imagem de evidência sem gravar nada em disco. Detalhes no [guia de passagem](GUIA_PASSAGEM.md).
+Para um quadro já em memória (array BGR do OpenCV, por exemplo de uma câmera), use `conferir_quadro(imagem_bgr, nota, config)`. Ela devolve o relatório e a imagem de evidência sem gravar nada em disco. Detalhes no [documento de continuidade](CONTINUIDADE.md).
 
 ### Outros comandos
 
@@ -174,7 +174,7 @@ config.json          # modelo, limiar, de-para e nomes em português
 
 ## Próximos passos
 
-Estão no [guia de passagem](GUIA_PASSAGEM.md): integração com o restante do sistema, modo câmera e troca de modelo.
+Estão no [documento de continuidade](CONTINUIDADE.md): integração com o restante do sistema, modo câmera e troca de modelo.
 
 ## Crédito do modelo
 
