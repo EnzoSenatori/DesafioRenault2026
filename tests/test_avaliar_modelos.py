@@ -62,3 +62,32 @@ def test_avaliacao_com_cliente_falso(tmp_path):
     assert resumo["imagens_com_contagem_exata"] == 0
     assert resumo["imagens"][0]["classes_nao_mapeadas"] == {"pipe_wrench": 1}
     assert (tmp_path / "saida" / "resposta_modelo-teste_1.json").exists()
+
+
+# Devolve o mesmo martelo em duas caixas quase iguais, como na dupla contagem observada.
+class ClienteMartelinhoDuplo:
+    # Simula duas predições muito sobrepostas da mesma ferramenta.
+    def infer(self, imagem, model_id=None):
+        return {"predictions": [
+            {"x": 100, "y": 100, "width": 80, "height": 60, "confidence": 0.95, "class": "Claw hammer"},
+            {"x": 104, "y": 102, "width": 80, "height": 60, "confidence": 0.85, "class": "Claw hammer"},
+        ]}
+
+
+# O fluxo real aplica aliases e consolidação; o bruto mede o modelo como veio.
+def test_fluxo_real_consolida_e_traduz(tmp_path):
+    imagem = tmp_path / "foto.jpg"
+    imagem.write_bytes((__import__("pathlib").Path(__file__).resolve().parent.parent /
+                        "imagens/teste/Img 16.jpg").read_bytes())
+    config = {"limiar_confianca": 0.6, "aliases_classes": {"Claw hammer": "Hammer"}}
+    gabarito = {"foto.jpg": {"Hammer": 1}}
+    bruto = avaliar_modelo("modelo-teste/1", [imagem], gabarito, {}, config,
+                           ClienteMartelinhoDuplo(), tmp_path / "saida")
+    real = avaliar_modelo("modelo-teste/1", [imagem], gabarito, {}, config,
+                          ClienteMartelinhoDuplo(), tmp_path / "saida", fluxo_real=True)
+    assert bruto["fluxo"] == "bruto" and bruto["imagens_com_contagem_exata"] == 0
+    assert bruto["imagens"][0]["classes_nao_mapeadas"] == {"Claw hammer": 2}
+    assert real["fluxo"] == "real" and real["imagens_com_contagem_exata"] == 1
+    assert real["imagens"][0]["deteccoes_suprimidas"] == 1
+    assert (tmp_path / "saida" / "modelo-teste_1_fluxo_real.json").exists()
+    assert (tmp_path / "saida" / "modelo-teste_1.json").exists()

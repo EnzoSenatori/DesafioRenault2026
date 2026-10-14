@@ -7,6 +7,7 @@ from pathlib import Path
 
 from conferir import carregar_config
 from detector import ErroDeteccao, converter_resposta, criar_cliente, ler_imagem
+from posprocessamento import consolidar_deteccoes
 from testar_modelo import EXTENSOES, PASTA_IMAGENS, chave_natural
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -83,18 +84,26 @@ def avaliar_imagem(esperado, detectado):
 
 
 # Mantém o nome do modelo em um caminho seguro para salvar o resultado.
-def nome_arquivo_modelo(modelo):
-    return re.sub(r"[^A-Za-z0-9_.-]", "_", modelo) + ".json"
+def nome_arquivo_modelo(modelo, fluxo_real=False):
+    return re.sub(r"[^A-Za-z0-9_.-]", "_", modelo) + ("_fluxo_real" if fluxo_real else "") + ".json"
+
+
+# Repete o que a conferência faz antes de contar: aliases do config e consolidação geométrica.
+def aplicar_fluxo_real(deteccoes, imagem, config):
+    aliases = config.get("aliases_classes", {})
+    traduzidas = [{**d, "classe": aliases.get(d["classe"], d["classe"])} for d in deteccoes]
+    return consolidar_deteccoes(traduzidas, imagem, config["limiar_confianca"])
 
 
 # Executa um modelo nas imagens gabaritadas e registra respostas e erros.
-def avaliar_modelo(modelo, imagens, gabarito, mapa, config, cliente, pasta=PASTA_AVALIACAO):
+def avaliar_modelo(modelo, imagens, gabarito, mapa, config, cliente, pasta=PASTA_AVALIACAO, fluxo_real=False):
     pasta.mkdir(parents=True, exist_ok=True)
     linhas = []
     fixture_salva = False
     for imagem in imagens:
         try:
-            resposta = cliente.infer(ler_imagem(imagem), model_id=modelo)
+            quadro = ler_imagem(imagem)
+            resposta = cliente.infer(quadro, model_id=modelo)
             deteccoes = converter_resposta(resposta)
         except Exception as erro:
             linhas.append({"imagem": imagem.name, "erro": type(erro).__name__})
@@ -103,8 +112,13 @@ def avaliar_modelo(modelo, imagens, gabarito, mapa, config, cliente, pasta=PASTA
             caminho_fixture = pasta / f"resposta_{nome_arquivo_modelo(modelo)}"
             caminho_fixture.write_text(json.dumps(resposta, indent=2, ensure_ascii=False), encoding="utf-8")
             fixture_salva = True
+        suprimidas = []
+        if fluxo_real:
+            deteccoes, suprimidas = aplicar_fluxo_real(deteccoes, quadro, config)
         contagens, desconhecidas = contar_deteccoes(deteccoes, mapa, config["limiar_confianca"])
         medidas = avaliar_imagem(gabarito[imagem.name], contagens)
+        if fluxo_real:
+            medidas["deteccoes_suprimidas"] = len(suprimidas)
         if desconhecidas:
             medidas["contagem_exata"] = False
         linhas.append({"imagem": imagem.name, "esperado": gabarito[imagem.name],
@@ -112,6 +126,7 @@ def avaliar_modelo(modelo, imagens, gabarito, mapa, config, cliente, pasta=PASTA
     validas = [linha for linha in linhas if "erro" not in linha]
     resumo = {
         "modelo_id": modelo,
+        "fluxo": "real" if fluxo_real else "bruto",
         "limiar_confianca": config["limiar_confianca"],
         "imagens_total": len(imagens),
         "imagens_avaliadas": len(validas),
@@ -122,7 +137,7 @@ def avaliar_modelo(modelo, imagens, gabarito, mapa, config, cliente, pasta=PASTA
         "erros": len(linhas) - len(validas),
         "imagens": linhas,
     }
-    (pasta / nome_arquivo_modelo(modelo)).write_text(json.dumps(resumo, indent=2, ensure_ascii=False), encoding="utf-8")
+    (pasta / nome_arquivo_modelo(modelo, fluxo_real)).write_text(json.dumps(resumo, indent=2, ensure_ascii=False), encoding="utf-8")
     return resumo
 
 
@@ -132,6 +147,8 @@ def main(argumentos=None):
     parser.add_argument("--modelos", nargs="+", required=True, help="model_id de cada candidato")
     parser.add_argument("--gabarito", default=str(PASTA_IMAGENS / "gabarito.json"))
     parser.add_argument("--mapeamento", help="JSON opcional: model_id -> classe original -> classe canônica")
+    parser.add_argument("--fluxo-real", action="store_true",
+                        help="aplica aliases_classes e a consolidação geométrica, como na conferência")
     args = parser.parse_args(argumentos)
     imagens = sorted((p for p in PASTA_IMAGENS.iterdir() if p.suffix.lower() in EXTENSOES), key=chave_natural)
     try:
@@ -143,9 +160,11 @@ def main(argumentos=None):
     except (ValueError, ErroDeteccao) as erro:
         print(f"Preparação interrompida: {erro}", file=sys.stderr)
         return 2
+    print(f"Fluxo {'real (aliases + consolidação)' if args.fluxo_real else 'bruto'}, limiar {config['limiar_confianca']}")
     print("Modelo | Imagens exatas | Itens corretos | Faltas | Excessos | Erros")
     for modelo in dict.fromkeys(args.modelos):
-        resumo = avaliar_modelo(modelo, imagens, gabarito, mapeamentos.get(modelo, {}), config, cliente)
+        resumo = avaliar_modelo(modelo, imagens, gabarito, mapeamentos.get(modelo, {}), config, cliente,
+                                fluxo_real=args.fluxo_real)
         print(f"{modelo} | {resumo['imagens_com_contagem_exata']}/{resumo['imagens_avaliadas']} | "
               f"{resumo['itens_corretos']} | {resumo['faltas']} | {resumo['excessos']} | {resumo['erros']}")
     return 0
