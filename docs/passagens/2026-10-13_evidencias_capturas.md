@@ -1,5 +1,7 @@
 # Capturas diagnósticas selecionadas — Desafio Renault 2026
 
+> **Registro datado de passagem**, recebido de Rafael em 13/10/2026 (arquivo original na raiz: `EVIDENCIAS_CAPTURAS_ENZO.md`). Foi movido para `docs/passagens/` na incorporação ao repositório e não é mais atualizado. O estado vigente está em `CONTINUIDADE.md`.
+
 As três subpastas em `evidencias_capturas/` contêm somente `quadro_analisado.jpg`, `imagem_anotada.jpg`, `analise_caixas.json` e `relatorio.json`. São resultados reais da webcam de Rafael em 13/10/2026, **anteriores** à mudança que faz uma segunda inferência no interior da caixa. O quadro completo da webcam foi deixado de fora do pacote. As fotos mostram apenas uma pequena amostra; não são uma avaliação estatística de acurácia.
 
 | Captura | O que a foto mostra | Resposta observada | O que investigar |

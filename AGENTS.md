@@ -1,12 +1,14 @@
 # Orientações para continuar o Desafio Renault 2026
 
+Estas regras valem para qualquer agente que trabalhe no repositório (Codex, Claude Code ou outro). O `CLAUDE.md` importa este arquivo.
+
 ## Colaboração com Rafael
 
 Rafael decide as questões importantes; o agente implementa e testa. Perguntar antes de trocar modelo ou limiar, ampliar escopo, criar serviços pagos, publicar, mudar contratos ou escolher a forma de integração. Preparação local, inspeção e testes podem avançar. Não exigir que Rafael escreva código.
 
 ## Contexto e contratos
 
-Leia CONTINUIDADE.md, CLAUDE.md e README.md. CONTINUIDADE.md descreve o estado mais recente; instruções atuais de Rafael prevalecem. O MVP usa ferramentas como substitutas de peças automotivas. Não quebrar o relatório da seção 3.6: não remover/renomear campos nem mudar os status conforme, divergente e erro. Campos adicionais exigem avaliar consumidores/testes.
+Leia CONTINUIDADE.md e README.md. CONTINUIDADE.md descreve o estado mais recente; instruções atuais de Rafael prevalecem. O MVP usa ferramentas como substitutas de peças automotivas. Não quebrar o relatório (seção “Contratos” do CONTINUIDADE.md, numerada 3.6 na versão de 12/10): não remover/renomear campos nem mudar os status conforme, divergente e erro. Campos adicionais exigem avaliar consumidores/testes.
 
 ## Convenções
 
@@ -43,4 +45,13 @@ python -m venv .venv
 .venv\Scripts\python.exe src\testar_modelo.py
 ```
 
-Inferência real requer chave e acesso ao Roboflow; testes automatizados usam clientes falsos. Saídas CLI: 0 conforme, 1 divergente, 2 erro. Preservar .env, .venv e saidas fora do versionamento. Esta pasta veio de ZIP e não possui histórico Git.
+Inferência real requer chave e acesso ao Roboflow; testes automatizados usam clientes falsos. Saídas CLI: 0 conforme, 1 divergente, 2 erro. Preservar .env, .venv e saidas fora do versionamento.
+
+## Repositório e documentação
+
+O repositório canônico é github.com/enzosenatori/desafiorenault2026. A base de Rafael, desenvolvida a partir de um ZIP sem histórico Git, foi incorporada em 13/10/2026 na branch `integracao-rafael-2026-10-13`. Trabalhar em branch; publicar (push, PR) segue a regra de perguntar antes.
+
+- `CONTINUIDADE.md`: fonte única do estado técnico. Atualizar a cada mudança de estado; não criar outro documento de estado.
+- `README.md`: face pública (instalação, execução, resultados e créditos).
+- `docs/passagens/`: registros datados de passagem, apenas histórico.
+- `docs/historico/`: briefing da construção inicial (`briefing_inicial_claude.md`, antigo `CLAUDE.md`) e guia de prompts de 12/10 (`guia_prompts_codex_2026-10-12.pdf`); suas instruções técnicas e numerações de seção não valem mais.

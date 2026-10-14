@@ -1,9 +1,11 @@
 # Desafio Renault 2026 — guia de continuidade para Enzo
 
+> **Registro datado de passagem**, recebido de Rafael em 13/10/2026 (arquivo original na raiz: `GUIA_CONTINUIDADE_ENZO.md`). Foi movido para `docs/passagens/` na incorporação ao repositório e não é mais atualizado. O estado vigente está em `CONTINUIDADE.md`. A incorporação já foi feita na branch `integracao-rafael-2026-10-13`; as instruções de receber o ZIP e comparar com o repositório ficam como histórico.
+
 **De:** Rafael / trabalho local no Codex  
 **Para:** Enzo Senatori  
 **Data:** 13/10/2026  
-**Referência:** `GUIA_PROMPTS_CODEX.pdf` enviado por Enzo em 12/10/2026, mais o código e as execuções reais posteriores.
+**Referência:** `GUIA_PROMPTS_CODEX.pdf` (hoje em `docs/historico/guia_prompts_codex_2026-10-12.pdf`) enviado por Enzo em 12/10/2026, mais o código e as execuções reais posteriores.
 
 Este documento é o estado atual para você retomar a base e a documentação do projeto. O PDF original estabeleceu a sequência **preparar → avaliar modelos → adotar um modelo → câmera → integração**. Os quatro primeiros passos foram executados; o quinto ainda precisa de decisões conjuntas. Rafael continua responsável pelo desenvolvimento com auxílio do Codex e decide mudanças importantes. A pasta local veio do ZIP `DesafioRenault2026-main.zip`, sem histórico Git; as mudanças descritas aqui ainda precisam ser incorporadas ao repositório canônico.
 
@@ -141,4 +143,4 @@ Principais arquivos adicionados: `AGENTS.md`, `src/avaliar_modelos.py`, `src/cam
 
 `saidas/`, `.env` e `.venv/` são locais/ignorados; não devem entrar no repositório. Como a origem foi um ZIP sem `.git`, a comparação e o commit no repositório do Enzo ainda não aconteceram. Enzo pode revisar e incorporar a base/documentação; Rafael conduz o desenvolvimento e decide os ajustes de modelo, limiar, escopo e integração.
 
-**Prompt sugerido para Claude/Codex na máquina do Enzo:** “Leia `AGENTS.md`, `GUIA_CONTINUIDADE_ENZO.md`, `CONTINUIDADE.md` e `README.md` antes de editar. Recebi um ZIP sem `.git` nem chave do Roboflow. Compare seus arquivos com o repositório canônico antes de incorporar mudanças. Execute os testes sem rede e analise os três casos em `evidencias_capturas/`. O modelo de caixa foi aceito em fotos posteriores, mas o martelo parcialmente oculto foi chamado de `Mallet`; a alteração que recorta o interior ainda não foi testada com inferência real. Preserve `relatorio.json`, os status e a distinção `Wrench`/`PipeWrench`; não mude limiar 0,6 ou modelos sem decisão de Rafael. Prepare documentação e integração somente após confirmar os cinco pontos da seção 8 com Rafael. Registre separadamente fatos observados, hipóteses e validações pendentes.”
+**Prompt sugerido para Claude/Codex na máquina do Enzo:** “Leia `AGENTS.md`, `docs/passagens/2026-10-13_guia_continuidade_enzo.md`, `CONTINUIDADE.md` e `README.md` antes de editar. Recebi um ZIP sem `.git` nem chave do Roboflow. Compare seus arquivos com o repositório canônico antes de incorporar mudanças. Execute os testes sem rede e analise os três casos em `evidencias_capturas/`. O modelo de caixa foi aceito em fotos posteriores, mas o martelo parcialmente oculto foi chamado de `Mallet`; a alteração que recorta o interior ainda não foi testada com inferência real. Preserve `relatorio.json`, os status e a distinção `Wrench`/`PipeWrench`; não mude limiar 0,6 ou modelos sem decisão de Rafael. Prepare documentação e integração somente após confirmar os cinco pontos da seção 8 com Rafael. Registre separadamente fatos observados, hipóteses e validações pendentes.”
