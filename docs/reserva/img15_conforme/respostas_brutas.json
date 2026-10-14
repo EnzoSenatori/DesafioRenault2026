@@ -1,6 +1,7 @@
 {
   "modelo_id": "tool-detection-4u0yd/15",
   "modelo_caixas_id": null,
+  "imagem_sha256": "872cf4baae413f6c00f3944eabd7184f1bf390a3fd84f5f907e53075d9104444",
   "chamadas": [
     {
       "modelo_id": "tool-detection-4u0yd/15",

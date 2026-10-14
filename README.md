@@ -46,7 +46,7 @@ A primeira comparação retorna `conforme`: quatro chaves inglesas ajustáveis n
 .venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json --sem-caixas --reproduzir docs/reserva/img16_divergente
 ```
 
-O fluxo, as regras e a evidência são os mesmos; o relatório recebe um aviso de que é uma reprodução, não uma nova inferência. `docs/reserva/reinferencia_<captura>/` guarda também uma nova inferência de 13/10 sobre as três capturas da webcam em `evidencias_capturas/`, incluindo o fluxo com caixa aberta. Qualquer pasta de `saidas/` pode ser reproduzida assim, com a mesma imagem e as mesmas opções (para capturas da câmera, use o `quadro_analisado.jpg` da pasta). Imagem ou opções diferentes da gravação resultam em `erro`.
+O fluxo, as regras e a evidência são os mesmos; o relatório recebe um aviso de que é uma reprodução, não uma nova inferência. `docs/reserva/reinferencia_<captura>/` guarda também uma nova inferência de 13/10 sobre as três capturas da webcam em `evidencias_capturas/`, incluindo o fluxo com caixa aberta. Cada gravação nova contém o SHA-256 do arquivo de imagem usado; a reprodução confere esse valor antes de usar as detecções. Para capturas da câmera, use o `quadro_analisado.jpg` salvo na pasta. Outra imagem, mesmo com dimensões iguais, ou opções incompatíveis resultam em `erro`. As reservas versionadas foram atualizadas; gravações locais antigas sem SHA-256 precisam ser feitas novamente para esse modo seguro.
 
 ## Modo câmera
 

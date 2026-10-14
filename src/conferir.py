@@ -10,7 +10,7 @@ from caixas import desenhar_caixas_embalagem, detectar_caixas_e_produtos, salvar
 from detector import ErroDeteccao, detectar, ler_imagem
 from nota import ErroEntrada, carregar_nota
 from posprocessamento import consolidar_deteccoes
-from reproducao import ClienteGravador, ClienteReproducao, carregar_respostas, salvar_respostas
+from reproducao import ClienteGravador, ClienteReproducao, carregar_respostas, hash_imagem, salvar_respostas
 from visualizacao import desenhar_caixas, imagem_vazia, montar_evidencia, salvar_jpg
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -125,9 +125,12 @@ def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, client
             config = config_sem_caixas(config)
         imagem = ler_imagem(caminho_imagem)
         nota = carregar_nota(caminho_nota, config["de_para"])
+        imagem_sha256 = hash_imagem(caminho_imagem)
         aviso_execucao = None
         if reproduzir:
-            cliente = ClienteReproducao(carregar_respostas(reproduzir), Path(reproduzir).as_posix())
+            cliente = ClienteReproducao(
+                carregar_respostas(reproduzir), Path(reproduzir).as_posix(), imagem_sha256
+            )
             aviso_execucao = (f"Reprodução offline das respostas gravadas em {Path(reproduzir).as_posix()} "
                               "— não é uma nova inferência")
     except (ErroEntrada, ErroDeteccao) as erro:
@@ -136,7 +139,7 @@ def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, client
         base = imagem if imagem is not None else imagem_vazia()
         evidencia = montar_evidencia(desenhar_caixas(base, [], {"limiar_confianca": 1.0}), relatorio)
     else:
-        gravador = ClienteGravador(config, cliente)
+        gravador = ClienteGravador(config, cliente, imagem_sha256)
         relatorio, evidencia, analise_caixas = analisar_quadro(
             imagem, nota, config, cliente=gravador, imagem_origem=imagem_origem,
             aviso_execucao=aviso_execucao,

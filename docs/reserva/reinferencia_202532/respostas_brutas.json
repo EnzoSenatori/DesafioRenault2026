@@ -1,6 +1,7 @@
 {
   "modelo_id": "tool-detection-4u0yd/15",
   "modelo_caixas_id": "open-closed-cardbox/2",
+  "imagem_sha256": "a34233e9ec6cabb6d9dda07012e4d1b762729190249dc03e64ee11074a5370c5",
   "chamadas": [
     {
       "modelo_id": "open-closed-cardbox/2",
