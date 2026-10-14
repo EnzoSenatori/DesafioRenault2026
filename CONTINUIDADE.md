@@ -158,6 +158,8 @@ Perguntas acrescentadas por Enzo em 13/10/2026, ligadas às etapas vizinhas do f
 
 Se for Python no mesmo processo, usar `conferir()` ou `conferir_quadro()`. Se for outra linguagem na mesma máquina, usar a CLI `--json` e os códigos de saída. Se a troca for por arquivos, usar `--saida`. Para máquinas distintas, uma API HTTP é possível, mas ainda não foi decidida por Rafael. Após definir a interface, criar um teste de integração sem rede cobrindo `conforme`, `divergente` e `erro`.
 
+**Preparação de integração em 13/10/2026:** Rafael está sem disponibilidade para novos testes de câmera e pediu que a conexão com Enzo fique preparada. `docs/guia_integracao_enzo.md` detalha a nota de entrada, o relatório de saída, exemplos de chamada Python/CLI, a reprodução offline, as sete decisões e as pendências de visão computacional. `tests/test_contrato_integracao.py` exercita a CLI como um sistema externo faria, sem rede, nos três resultados `conforme`, `divergente` e `erro`. Isso valida o contrato local já existente; **não** constitui integração com as etapas 1 e 5 nem nova prova de acurácia. Não foi criada API, fila, persistência ou conversor de NF-e, pois a forma depende das respostas de Rafael e Enzo. O modelo, as classes, o limiar 0,6 e o formato de `relatorio.json` permanecem iguais.
+
 ## Critérios de aceite e riscos restantes
 
 - [x] Gabarito de quatro imagens conferido por Rafael; modelo escolhido e configurado.

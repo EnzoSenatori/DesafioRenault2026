@@ -106,6 +106,8 @@ Para cada classe esperada ou detectada acima do limiar, `delta = detectado − e
 
 Um orquestrador Python pode chamar `conferir()` para arquivos ou `conferir_quadro()` para um quadro BGR em memória. Outras linguagens podem usar a CLI com `--json` e o código de saída, ou ler os arquivos da pasta `--saida`. Antes de construir uma API, é preciso combinar com o colega como o sistema dele entrega imagem e nota e qual retorno espera. O contrato e as perguntas estão em [`CONTINUIDADE.md`](CONTINUIDADE.md).
 
+O [guia de integração para Enzo](docs/guia_integracao_enzo.md) reúne exemplos de entrada e saída, chamadas locais, teste sem internet e as decisões necessárias para ligar as etapas 1, 3 e 5.
+
 ```powershell
 .venv\Scripts\python.exe -m pytest
 .venv\Scripts\python.exe src\avaliar_modelos.py --modelos tools-classification-byznk/2 mechanical-tools-83ynn/2 tool-detection-4u0yd/15 tools-v1/1 --mapeamento modelos_avaliacao.json
