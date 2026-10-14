@@ -6,7 +6,7 @@ Este protótipo compara itens vistos numa foto ou numa captura de câmera com um
 
 ## Estado validado
 
-Rafael escolheu o modelo público **Tool Detection**, de GantrySystem, versão `tool-detection-4u0yd/15`. O gabarito humano de quatro imagens fica em `imagens/teste/gabarito.json`. Na avaliação original, com limiar 0,5, o modelo acertou a contagem inteira em **3 de 4 imagens** e **8 itens**, sem faltas e com **1 excesso**. Na `Img 8.jpeg`, uma única imagem de martelo gerou duas detecções: essa dupla contagem continua sendo uma limitação conhecida. Na `Img 16.jpg`, ele distinguiu corretamente uma chave inglesa ajustável (`Wrench`) de uma chave de grifo (`PipeWrench`). O resultado se aplica apenas às quatro imagens avaliadas e não é uma estimativa de desempenho em uso real. **O limiar atual é 0,6**, escolhido por Rafael após os testes de câmera de 13/10; as métricas originais e os exemplos em `docs/` ainda refletem 0,5.
+Rafael escolheu o modelo público **Tool Detection**, de GantrySystem, versão `tool-detection-4u0yd/15`. O gabarito humano de quatro imagens fica em `imagens/teste/gabarito.json`. Na avaliação original, com limiar 0,5, o modelo acertou a contagem inteira em **3 de 4 imagens** e **8 itens**, sem faltas e com **1 excesso**. Na `Img 8.jpeg`, uma única imagem de martelo gerou duas detecções: essa dupla contagem continua sendo uma limitação conhecida. Na `Img 16.jpg`, ele distinguiu corretamente uma chave inglesa ajustável (`Wrench`) de uma chave de grifo (`PipeWrench`). O resultado se aplica apenas às quatro imagens avaliadas e não é uma estimativa de desempenho em uso real. **O limiar atual é 0,6**, escolhido por Rafael após os testes de câmera de 13/10. A avaliação repetida com 0,6 em 13/10 deu o mesmo resultado, e os exemplos de `docs/` foram regenerados com 0,6.
 
 O mapeamento de nomes brutos do modelo para as classes do projeto está em `aliases_classes` no [`config.json`](config.json). `Adjustable Wrench` vira `Wrench`, `Pipe Wrench` vira `PipeWrench`, os dois tipos de chave de fenda viram `Screwdriver` e `Claw hammer` vira `Hammer`. Outras classes que o modelo detectar não são descartadas: aparecem como itens não previstos quando não constarem da nota.
 
@@ -29,11 +29,24 @@ Preencha `ROBOFLOW_API_KEY` no `.env` local. Nunca compartilhe nem publique esse
 ## Conferir uma imagem
 
 ```powershell
-.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 15.jpg" --nota notas/nota_conforme.json
-.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 15.jpg" --nota notas/nota_conforme.json --sem-caixas
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json --sem-caixas
 ```
 
-A primeira comparação retorna `conforme`: quatro chaves inglesas ajustáveis na imagem e na nota. A segunda retorna `divergente`: a nota espera uma chave inglesa ajustável, e a foto também contém uma chave de grifo não prevista. Cada execução cria uma pasta em `saidas/` com `relatorio.json` e `imagem_anotada.jpg`. Use `--saida PASTA` para escolher a pasta e `--json` para imprimir o relatório completo. Códigos de saída: `0` conforme, `1` divergente, `2` erro técnico.
+A primeira comparação retorna `conforme`: quatro chaves inglesas ajustáveis na imagem e na nota. A segunda retorna `divergente`: a nota espera uma chave inglesa ajustável, e a foto também contém uma chave de grifo não prevista. Cada execução cria uma pasta em `saidas/` com `relatorio.json`, `imagem_anotada.jpg` e `respostas_brutas.json` (as respostas do Roboflow, para reprodução). Use `--saida PASTA` para escolher a pasta e `--json` para imprimir o relatório completo. Códigos de saída: `0` conforme, `1` divergente, `2` erro técnico.
+
+`--sem-caixas` confere só com o modelo de ferramentas, ignorando `modelo_caixas_id` do `config.json` naquela execução. Sem a opção, a conferência também consulta o modelo de caixas: nas fotos sem caixa, isso acrescenta uma chamada ao Roboflow e o aviso de que nenhuma caixa aberta foi detectada, sem mudar o status.
+
+### Demonstração sem internet
+
+`docs/reserva/` guarda as respostas reais de 13/10 dos dois cenários acima. Para refazer a conferência sem chamar o Roboflow:
+
+```powershell
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 15.jpg" --nota notas/nota_conforme.json --sem-caixas --reproduzir docs/reserva/img15_conforme
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json --sem-caixas --reproduzir docs/reserva/img16_divergente
+```
+
+O fluxo, as regras e a evidência são os mesmos; o relatório recebe um aviso de que é uma reprodução, não uma nova inferência. Qualquer pasta de `saidas/` pode ser reproduzida assim, com a mesma imagem e as mesmas opções (para capturas da câmera, use o `quadro_analisado.jpg` da pasta). Imagem ou opções diferentes da gravação resultam em `erro`.
 
 ## Modo câmera
 
@@ -96,17 +109,18 @@ Um orquestrador Python pode chamar `conferir()` para arquivos ou `conferir_quadr
 ```powershell
 .venv\Scripts\python.exe -m pytest
 .venv\Scripts\python.exe src\avaliar_modelos.py --modelos tools-classification-byznk/2 mechanical-tools-83ynn/2 tool-detection-4u0yd/15 tools-v1/1 --mapeamento modelos_avaliacao.json
+.venv\Scripts\python.exe src\avaliar_modelos.py --modelos tool-detection-4u0yd/15 --mapeamento modelos_avaliacao.json --fluxo-real
 ```
 
-Os testes usam clientes falsos, sem rede nem webcam. A avaliação de modelos usa o gabarito humano e chama o Roboflow. Seus resultados ficam em `saidas/avaliacao/`.
+Os testes usam clientes falsos, sem rede nem webcam. A avaliação de modelos usa o gabarito humano e chama o Roboflow; por padrão mede o modelo bruto, e `--fluxo-real` aplica os `aliases_classes` e a consolidação geométrica, como a conferência faz. Seus resultados ficam em `saidas/avaliacao/`.
 
 ## Arquivos principais
 
-`src/conferir.py` faz a conferência por arquivo e contém o núcleo `conferir_quadro`; `src/camera.py` cuida da captura; `src/detector.py` consulta e normaliza a resposta do Roboflow; `src/caixas.py` consulta os dois modelos e associa ferramentas a caixas; `src/posprocessamento.py` consolida detecções fragmentadas; `src/nota.py` valida a nota; `src/comparador.py` calcula diferenças; `src/visualizacao.py` desenha as evidências; `src/avaliar_modelos.py` compara candidatos com o gabarito. `tests/` contém testes sem serviços externos; `docs/` contém exemplos gerados por execução real.
+`src/conferir.py` faz a conferência por arquivo e contém o núcleo `conferir_quadro`; `src/camera.py` cuida da captura; `src/detector.py` consulta e normaliza a resposta do Roboflow; `src/caixas.py` consulta os dois modelos e associa ferramentas a caixas; `src/posprocessamento.py` consolida detecções fragmentadas; `src/nota.py` valida a nota; `src/comparador.py` calcula diferenças; `src/visualizacao.py` desenha as evidências; `src/avaliar_modelos.py` compara candidatos com o gabarito; `src/reproducao.py` grava as respostas do Roboflow e as reproduz sem rede. `tests/` contém testes sem serviços externos; `docs/` contém exemplos gerados por execução real e, em `docs/reserva/`, as respostas para a demonstração sem internet.
 
 ## Limitações
 
-A demonstração depende de internet e do serviço Roboflow. As fotos avaliadas não cobrem iluminação, oclusão, câmera, peças reais ou todos os tipos de ferramentas. A dupla contagem do martelo apareceu tanto na `Img 8.jpeg` quanto numa captura de câmera com um martelo e uma chave de fenda: nessa captura, o mesmo martelo recebeu duas caixas com confianças 0,98 e 0,78. Ambas passam pelo limiar 0,6; o filtro geométrico agora tenta consolidar esse tipo de duplicação, mas ainda precisa de nova prova real. Nas capturas com martelo isolado, um falso positivo de chave de fenda 0,52 será descartado pelo novo limiar, mas uma falsa trena 0,91 continuará sendo contada. Um martelo verdadeiro apareceu com 0,73: elevar o limiar a 0,8 o perderia. A confiança é uma pontuação do modelo, não uma garantia de acerto. A nota é JSON simulado; ainda não há leitura de NF-e nem integração com o sistema do colega.
+A conferência ao vivo depende de internet e do serviço Roboflow; sem rede, só é possível reproduzir execuções gravadas. As fotos avaliadas não cobrem iluminação, oclusão, câmera, peças reais ou todos os tipos de ferramentas. A dupla contagem do martelo apareceu tanto na `Img 8.jpeg` quanto numa captura de câmera com um martelo e uma chave de fenda: nessa captura, o mesmo martelo recebeu duas caixas com confianças 0,98 e 0,78. Ambas passam pelo limiar 0,6; o filtro geométrico agora tenta consolidar esse tipo de duplicação, mas ainda precisa de nova prova real. Nas capturas com martelo isolado, um falso positivo de chave de fenda 0,52 será descartado pelo novo limiar, mas uma falsa trena 0,91 continuará sendo contada. Um martelo verdadeiro apareceu com 0,73: elevar o limiar a 0,8 o perderia. A confiança é uma pontuação do modelo, não uma garantia de acerto. A nota é JSON simulado; ainda não há leitura de NF-e nem integração com o sistema do colega.
 
 ## Créditos dos modelos
 

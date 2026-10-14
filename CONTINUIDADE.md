@@ -28,7 +28,7 @@ O desafio trata do recebimento de materiais na Renault. Esta equipe responde pel
 
   O proelec3, modelo do protótipo inicial, não distinguia a chave ajustável da chave de grifo nas fotos do projeto; essa distinção motivou a troca.
 - **Medição de 13/10/2026, limiar 0,6** (execução real por Enzo, `src/avaliar_modelos.py --modelos tool-detection-4u0yd/15 --mapeamento modelos_avaliacao.json`): resultado idêntico ao de 0,5 — **3/4 imagens exatas, 8 itens corretos, 0 faltas, 1 excesso**. `Img 2`, `Img 15` e `Img 16` exatas; `Img 8.jpeg` com 2 martelos para 1 (confianças 0,994 e 0,989). O script mede o modelo bruto, sem `posprocessamento`. Uma medição auxiliar do fluxo real (`analisar_quadro`, com consolidação) deu as mesmas contagens nas quatro imagens: o filtro geométrico **não** retira o segundo martelo da `Img 8.jpeg`, porque as duas caixas não se sobrepõem nem são alinhadas. Na mesma sessão, uma nova inferência real sobre o `quadro_analisado.jpg` salvo da captura `202532` devolveu de novo 3+3 detecções brutas, e o filtro resultou em 1 martelo, 1 chave de fenda e `conforme` — confirmação com o mesmo quadro, não com uma captura nova. Tempos medidos na rede de Enzo: chamadas aquecidas de 0,22 a 0,31 s; conferência por arquivo com dois modelos e nenhuma caixa (2 chamadas) de 0,5 a 0,7 s; captura `205725` com uma caixa aceita (3 chamadas) em 0,78 s; a primeira chamada ao modelo de caixas na sessão levou 4,4 s.
-- Execuções reais no Roboflow: `Img 15.jpg` contra `nota_conforme.json` resultou em `conforme` (4/4 chaves ajustáveis). `Img 16.jpg` contra `nota_divergente.json` resultou em `divergente` por uma chave de grifo não prevista. Evidências em `docs/`, geradas com limiar 0,5 e sem o modelo de caixas. O guia de 12/10 sugeria uma nota divergente com quantidade declarada maior que a foto; Rafael preferiu demonstrar uma **peça de outro tipo** presente na imagem e ausente da nota.
+- Execuções reais no Roboflow: `Img 15.jpg` contra `nota_conforme.json` resultou em `conforme` (4/4 chaves ajustáveis). `Img 16.jpg` contra `nota_divergente.json` resultou em `divergente` por uma chave de grifo não prevista. Evidências em `docs/`, regeneradas em 13/10 com limiar 0,6 e `--sem-caixas` (mesmos resultados de 0,5); `docs/reserva/` guarda as respostas brutas desses dois cenários para reprodução sem rede. O guia de 12/10 sugeria uma nota divergente com quantidade declarada maior que a foto; Rafael preferiu demonstrar uma **peça de outro tipo** presente na imagem e ausente da nota.
 - Testes automatizados: 66 passaram após a correção geométrica e o recorte interno das caixas, sem rede. Rafael abriu a webcam física e fez várias capturas antes da mudança mais recente. O sistema gravou fotos, relatórios e evidências e reconheceu martelo e chave de fenda. Com `nota_martelo_camera.json`, uma captura de 13/10/2026 retornou `conforme` (um martelo detectado; confiança 0,73). Outras capturas do mesmo cenário ficaram `divergente` por falsos positivos no teclado/entorno: `Screwdriver` 0,52 e `Tape Measure` 0,91. Numa captura anterior com martelo e chave de fenda, o martelo recebeu duas caixas (0,98 e 0,78), confirmando o risco de dupla contagem. Esses resultados foram obtidos antes do recorte interno; não são métricas do novo fluxo.
 
 Em 13/10/2026, Rafael testou o fluxo com caixa aberta, martelo dentro e chave de fenda fora. Em `saidas/camera_20261013_202532`, o modelo de ferramentas gerou **3 caixas de martelo e 3 de chave de fenda** para dois objetos reais; o modelo de embalagens não encontrou caixa aberta aceita. `src/posprocessamento.py` consolida caixas muito sobrepostas, partes alinhadas de ferramentas longas e um fragmento pequeno no canto. Uma reprodução local das coordenadas salvas produziu **1 martelo, 1 chave de fenda e status `conforme`**; ela **não é uma nova inferência real**. Em novas fotos `camera_20261013_205602` a caixa foi chamada `Closed Cardboard Box` com 0,52; em `_205632`, `Open Cardboard Box` apareceu com 0,34, abaixo de 0,6. Nas sete capturas de `_205647` a `_205725`, a caixa aberta foi aceita com confiança entre 0,70 e 0,86. A caixa quase preenchia o recorte e o antigo rótulo azul caía fora da imagem; o desenho foi corrigido. Nessas fotos o martelo estava parcialmente coberto pela parede frontal, e o modelo de ferramentas frequentemente o chamou `Mallet` ou não o encontrou; a chave de fenda esperada também não estava claramente visível dentro do recorte. A nova análise interna tenta resolver a perda de escala e contexto, mas ainda precisa de teste real de Rafael. O ambiente do agente não conseguiu completar chamadas à API Roboflow, mesmo com rede liberada; **não declarar melhora de acurácia como validada**. Próximo teste: caixa inteira na área verde, abertura vista de cima, martelo e chave de fenda desobstruídos, nova captura e inspeção de `caixa_1_interior.jpg`, `analise_caixas.json` e `relatorio.json`.
@@ -76,12 +76,12 @@ Relatório estável:
   "descartadas": [],
   "avisos": [],
   "modelo_id": "tool-detection-4u0yd/15",
-  "limiar_confianca": 0.5,
-  "gerado_em": "2026-10-12T22:39:22-03:00"
+  "limiar_confianca": 0.6,
+  "gerado_em": "2026-10-13T22:43:21-03:00"
 }
 ```
 
-O JSON acima é o relatório real anterior à mudança de limiar; o campo `limiar_confianca` das novas execuções será `0.6`.
+O JSON acima é o relatório real de 13/10 (`docs/exemplo_relatorio.json`).
 
 `delta = detectado - esperado`. Situações: `igual`, `falta`, `excesso`, `nao_previsto`. `conforme` exige todas as linhas iguais; diferença dá `divergente`; falha técnica dá `erro` com causa em `avisos`. Não remova nem renomeie campos ou status. Em `nao_previsto`, `codigo` vem do `de_para` quando existir, senão é `null`. `conferir()` e `conferir_quadro()` retornam relatório `erro` nas falhas técnicas, sem transformar erro em conformidade.
 
@@ -102,8 +102,9 @@ Para outra linguagem na mesma máquina, chamar `src/conferir.py --imagem ... --n
 ## Execução local
 
 ```powershell
-.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 15.jpg" --nota notas/nota_conforme.json
-.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 15.jpg" --nota notas/nota_conforme.json --sem-caixas
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json --sem-caixas
+.venv\Scripts\python.exe src\conferir.py --imagem "imagens/teste/Img 16.jpg" --nota notas/nota_divergente.json --sem-caixas --reproduzir docs/reserva/img16_divergente
 .venv\Scripts\python.exe src\camera.py --nota notas/nota_martelo_camera.json --camera 0
 .venv\Scripts\python.exe src\camera.py --nota notas/nota_caixa_aberta_demo.json --camera 0
 .venv\Scripts\python.exe -m pytest
@@ -170,7 +171,21 @@ Se for Python no mesmo processo, usar `conferir()` ou `conferir_quadro()`. Se fo
 - [ ] Interface com o sistema do colega definida e testada.
 - [ ] Testes com fotos da câmera e peças/ferramentas no cenário real; quatro fotos de produto não bastam para garantir precisão.
 
-Riscos principais: dupla contagem do martelo, falsos positivos no entorno, mudança de iluminação/fundo/ângulo, dependência de rede/serviço Roboflow e ausência de dados de peças automotivas. Nas capturas de 13/10, o limiar 0,60 retira a falsa chave de fenda 0,52 e preserva o martelo 0,73, mas não retira a falsa trena 0,91. Limiar 0,80 perderia esse martelo verdadeiro. A confiança 0,78 da segunda caixa em outra captura não mede probabilidade real de acerto. Rafael escolheu 0,60; não trocar modelo, treinar outro ou criar API sem decisão dele.
+Riscos principais: dupla contagem do martelo (inclusive entre classes, como `Hammer` e `Mallet` no mesmo objeto), falsos positivos no entorno, mudança de iluminação/fundo/ângulo, dependência de rede/serviço Roboflow (mitigada pela reprodução de `docs/reserva/`) e ausência de dados de peças automotivas. Nas capturas de 13/10, o limiar 0,60 retira a falsa chave de fenda 0,52 e preserva o martelo 0,73, mas não retira a falsa trena 0,91. Limiar 0,80 perderia esse martelo verdadeiro. A confiança 0,78 da segunda caixa em outra captura não mede probabilidade real de acerto. Rafael escolheu 0,60; não trocar modelo, treinar outro ou criar API sem decisão dele.
+
+## Propostas da revisão de 13/10 (aguardando aprovação de Rafael)
+
+Implementadas por Enzo na branch `propostas-revisao-2026-10-13`, um commit por proposta, com testes sem rede (74 testes no total). Nenhuma muda modelo, limiar, classes do `de_para` nem o formato de `relatorio.json`. Rafael pode aceitar, ajustar ou descartar cada uma.
+
+1. **`--sem-caixas`** em `conferir.py` e `camera.py`: confere só com o modelo de ferramentas sem editar o config. Motivo: com `modelo_caixas_id` ativo, a demonstração por arquivo fazia 2 chamadas e exibia o aviso de caixa ausente. O padrão continua com dois modelos.
+2. **`avaliar_modelos.py --fluxo-real`**: aplica `aliases_classes` e `consolidar_deteccoes` antes de contar. Execução real em 13/10, limiar 0,6: 3/4 exatas, 8 corretos, 0 faltas, 1 excesso, igual ao fluxo bruto.
+3. **Auditoria do recorte interno**: as detecções abaixo do limiar no recorte de uma caixa que substitui o quadro geral passam a constar em `descartadas`; `recortes_internos[].abaixo_do_limiar` registra todas. Contagem e status não mudam.
+4. **`nomes_exibicao`**: `Mallet` → Marreta e `Tape Measure` → Trena, sem entrar no `de_para` e sem virar `Hammer`. Muda só o texto do campo `item`.
+5. **Plano B offline**: cada execução grava `respostas_brutas.json`; `conferir.py --reproduzir PASTA` refaz a conferência a partir dela, sem rede, com aviso no relatório. Os exemplos de `docs/` foram regenerados com 0,6 e `--sem-caixas`, e `docs/reserva/` guarda as respostas dos dois cenários.
+
+Medição de tempo (rede de Enzo, 13/10): chamadas aquecidas de 0,22 a 0,31 s; 2 chamadas em 0,5–0,7 s; 3 chamadas (uma caixa aceita) em 0,78 s; a primeira chamada ao modelo de caixas na sessão levou 4,4 s, provável partida a frio do serviço. Recomendação: uma conferência de aquecimento antes do pitch.
+
+**Ponto aberto, sem implementação:** na captura `205632`, o mesmo martelo saiu como `Hammer` 0,62 e `Mallet` 0,61 quase na mesma posição, e os dois contam; a consolidação só junta detecções da mesma classe. Juntar classes parecidas sobrepostas é decisão de Rafael, porque mexe na distinção entre ferramentas.
 
 ## Próximos pontos para qualidade
 
