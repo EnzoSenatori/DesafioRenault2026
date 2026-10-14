@@ -174,3 +174,24 @@ def test_com_caixas_por_padrao(tmp_path):
     relatorio, pasta = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG, cliente=cliente)
     assert cliente.modelos[0] == CONFIG["modelo_caixas_id"]
     assert (pasta / "analise_caixas.json").exists()
+
+
+# Simula a marreta e a trena que o modelo devolve fora do de_para.
+class ClienteMarretaTrena:
+    # Devolve classes sem código na nota, como nas capturas da webcam.
+    def infer(self, imagem, model_id=None):
+        return {"predictions": [
+            {"x": 180, "y": 290, "width": 120, "height": 400, "confidence": 0.84, "class": "Mallet"},
+            {"x": 330, "y": 290, "width": 120, "height": 400, "confidence": 0.91, "class": "Tape Measure"},
+        ]}
+
+
+# Marreta e trena aparecem em português, continuam sem código e não viram martelo.
+def test_classes_fora_do_de_para_em_portugues(tmp_path):
+    nota = escrever_nota(tmp_path, 1)
+    relatorio, _ = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG,
+                            cliente=ClienteMarretaTrena(), sem_caixas=True)
+    linhas = {linha["classe"]: linha for linha in relatorio["linhas"]}
+    assert linhas["Mallet"]["item"] == "Marreta" and linhas["Mallet"]["codigo"] is None
+    assert linhas["Tape Measure"]["item"] == "Trena" and linhas["Tape Measure"]["situacao"] == "nao_previsto"
+    assert "Hammer" not in linhas and "Mallet" not in CONFIG["de_para"].values()
