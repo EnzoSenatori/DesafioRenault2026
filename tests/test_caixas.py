@@ -226,3 +226,25 @@ def test_captura_com_fragmentos_conta_um_de_cada():
     assert analise["total_produtos"] == 2
     assert len(analise["deteccoes_suprimidas"]) == 4
     assert any("4 detecção" in aviso for aviso in relatorio["avisos"])
+
+
+# Detecções fracas do recorte interno aparecem em descartadas e na análise, sem entrar na contagem.
+def test_recorte_interno_registra_fracas_em_descartadas():
+    imagem = np.zeros((300, 400, 3), dtype=np.uint8)
+    cliente = ClienteDoisModelos(
+        [predicao("Open Cardboard Box", 180, 150, 260, 240)],
+        [predicao("Claw hammer", 180, 150, 200, 180, confianca=0.4)],
+        [[predicao("Claw hammer", 120, 100, 80, 60),
+          predicao("Flat Head Screwdriver", 60, 60, 30, 30, confianca=0.45)]],
+    )
+    nota = validar_nota({"nota_id": "NF-AUDITORIA", "itens": [
+        {"codigo": "FER-004", "quantidade": 1},
+    ]}, CONFIG["de_para"])
+
+    relatorio, _, analise = analisar_quadro(imagem, nota, config_dupla(), cliente)
+
+    assert relatorio["status"] == "conforme"
+    assert relatorio["descartadas"] == [{"classe": "Screwdriver", "confianca": 0.45}]
+    assert analise["recortes_internos"][0]["abaixo_do_limiar"] == [
+        {"classe": "Screwdriver", "confianca": 0.45}]
+    assert analise["total_produtos"] == 1

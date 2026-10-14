@@ -78,6 +78,7 @@ def detectar_caixas_e_produtos(imagem_bgr, config, cliente=None):
     )
     recortes = []
     produtos_internos = []
+    fracas_internas = []
     caixas_com_recorte_positivo = []
     for indice, caixa in enumerate(caixas, start=1):
         recorte, limites = recortar_interior(imagem_bgr, caixa)
@@ -89,20 +90,25 @@ def detectar_caixas_e_produtos(imagem_bgr, config, cliente=None):
         internas, suprimidas_locais = consolidar_deteccoes(
             brutas, recorte, config["limiar_confianca"]
         )
-        aceitas = [deslocar_deteccao(item, x1, y1) for item in internas
-                   if item["confianca"] >= config["limiar_confianca"]]
-        aceitas = [item for item in aceitas if produto_dentro(item, caixa)]
+        deslocadas = [item for item in (deslocar_deteccao(d, x1, y1) for d in internas)
+                      if produto_dentro(item, caixa)]
+        aceitas = [item for item in deslocadas if item["confianca"] >= config["limiar_confianca"]]
+        fracas = [item for item in deslocadas if item["confianca"] < config["limiar_confianca"]]
         recortes.append({"indice_caixa": indice, "analisado": True,
                          "regiao_xyxy": [x1, y1, x2, y2],
-                         "produtos_aceitos": len(aceitas)})
+                         "produtos_aceitos": len(aceitas),
+                         "abaixo_do_limiar": [{"classe": item["classe"], "confianca": round(item["confianca"], 3)}
+                                              for item in fracas]})
         if aceitas:
             caixas_com_recorte_positivo.append(caixa)
             produtos_internos.extend(aceitas)
+            # O recorte substitui o quadro geral nesta caixa; suas fracas seguem para a auditoria.
+            fracas_internas.extend(fracas)
         suprimidas.extend(deslocar_deteccao(item, x1, y1) for item in suprimidas_locais)
     produtos_globais = [item for item in produtos_globais
                         if not any(produto_dentro(item, caixa)
                                    for caixa in caixas_com_recorte_positivo)]
-    produtos = produtos_globais + produtos_internos
+    produtos = produtos_globais + produtos_internos + fracas_internas
     analise = associar_produtos(produtos, caixas, config)
     analise["recortes_internos"] = recortes
     analise["caixas_ignoradas"] = [
