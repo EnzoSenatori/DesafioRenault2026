@@ -1,0 +1,6 @@
+{
+  "Img 2.jpg": {"Screwdriver": 1},
+  "Img 8.jpeg": {"Hammer": 1},
+  "Img 15.jpg": {"Wrench": 4},
+  "Img 16.jpg": {"Wrench": 1, "PipeWrench": 1}
+}

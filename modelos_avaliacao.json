@@ -1,0 +1,34 @@
+{
+  "tools-classification-byznk/2": {
+    "Pliers": "Pliers",
+    "Screwdriver": "Screwdriver",
+    "Wrench": "Wrench",
+    "Hammer": "Hammer"
+  },
+  "mechanical-tools-83ynn/2": {
+    "pliers": "Pliers",
+    "screwdriver": "Screwdriver",
+    "wrench": "Wrench",
+    "hammer": "Hammer"
+  },
+  "tool-detection-4u0yd/15": {
+    "Pliers": "Pliers",
+    "Flat Head Screwdriver": "Screwdriver",
+    "Philips Screwdriver": "Screwdriver",
+    "Adjustable Wrench": "Wrench",
+    "Pipe Wrench": "PipeWrench",
+    "Hammer": "Hammer"
+  },
+  "tools-v1/1": {
+    "Screwdriver": "Screwdriver",
+    "Phillips screwdriver": "Screwdriver",
+    "Flat Head Screwdriver": "Screwdriver",
+    "Adjustable wrench": "Wrench",
+    "Pipe wrench": "PipeWrench",
+    "Claw hammer": "Hammer",
+    "Ball-peen hammer": "Hammer",
+    "Combination pliers": "Pliers",
+    "Linesman pliers": "Pliers",
+    "Needle nose pliers": "Pliers"
+  }
+}
