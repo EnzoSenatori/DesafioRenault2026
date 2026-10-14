@@ -1,0 +1,21 @@
+{
+  "nota_id": "NF-DEMO-001",
+  "imagem": "imagens/teste/Img 15.jpg",
+  "status": "conforme",
+  "linhas": [
+    {
+      "codigo": "FER-003",
+      "item": "Chave inglesa ajustável",
+      "classe": "Wrench",
+      "esperado": 4,
+      "detectado": 4,
+      "delta": 0,
+      "situacao": "igual"
+    }
+  ],
+  "descartadas": [],
+  "avisos": [],
+  "modelo_id": "tool-detection-4u0yd/15",
+  "limiar_confianca": 0.6,
+  "gerado_em": "2026-10-13T22:43:18-03:00"
+}

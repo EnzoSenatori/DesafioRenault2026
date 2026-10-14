@@ -1,0 +1,30 @@
+{
+  "nota_id": "NF-DEMO-002",
+  "imagem": "imagens/teste/Img 16.jpg",
+  "status": "divergente",
+  "linhas": [
+    {
+      "codigo": "FER-003",
+      "item": "Chave inglesa ajustável",
+      "classe": "Wrench",
+      "esperado": 1,
+      "detectado": 1,
+      "delta": 0,
+      "situacao": "igual"
+    },
+    {
+      "codigo": "FER-005",
+      "item": "Chave de grifo",
+      "classe": "PipeWrench",
+      "esperado": 0,
+      "detectado": 1,
+      "delta": 1,
+      "situacao": "nao_previsto"
+    }
+  ],
+  "descartadas": [],
+  "avisos": [],
+  "modelo_id": "tool-detection-4u0yd/15",
+  "limiar_confianca": 0.6,
+  "gerado_em": "2026-10-13T22:43:21-03:00"
+}
