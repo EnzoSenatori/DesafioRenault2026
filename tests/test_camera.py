@@ -56,7 +56,7 @@ class CameraFalsa:
         self.liberada = True
 
 
-# A captura salva foto, recorte, relatório e evidência, distinguindo o item não previsto.
+# A captura salva foto, recorte, relatório, evidência e respostas brutas, distinguindo o item não previsto.
 def test_processar_captura_salva_e_compara(tmp_path):
     nota = validar_nota({"nota_id": "NF-CAM", "itens": [
         {"codigo": "FER-003", "quantidade": 1}
@@ -71,7 +71,7 @@ def test_processar_captura_salva_e_compara(tmp_path):
     assert evidencia.ndim == 3
     assert {p.name for p in pasta.iterdir()} == {
         "quadro_original.jpg", "quadro_analisado.jpg", "imagem_anotada.jpg",
-        "relatorio.json", "analise_caixas.json"
+        "relatorio.json", "analise_caixas.json", "respostas_brutas.json"
     }
     assert json.loads((pasta / "analise_caixas.json").read_text(encoding="utf-8"))["modelo_caixas_id"] == CONFIG["modelo_caixas_id"]
     assert json.loads((pasta / "relatorio.json").read_text(encoding="utf-8")) == relatorio

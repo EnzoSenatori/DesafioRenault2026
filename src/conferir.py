@@ -10,6 +10,7 @@ from caixas import desenhar_caixas_embalagem, detectar_caixas_e_produtos, salvar
 from detector import ErroDeteccao, detectar, ler_imagem
 from nota import ErroEntrada, carregar_nota
 from posprocessamento import consolidar_deteccoes
+from reproducao import ClienteGravador, ClienteReproducao, carregar_respostas, salvar_respostas
 from visualizacao import desenhar_caixas, imagem_vazia, montar_evidencia, salvar_jpg
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -41,7 +42,7 @@ def nova_pasta_execucao(caminho_imagem, base=PASTA_SAIDAS):
 
 
 # Roda a conferência e devolve também a análise por caixa quando há dois modelos configurados.
-def analisar_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
+def analisar_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None, aviso_execucao=None):
     if imagem_bgr is None or getattr(imagem_bgr, "ndim", 0) != 3:
         relatorio = montar_relatorio(
             resultado_erro("Quadro vazio ou inválido — confira a câmera ou a imagem enviada"),
@@ -74,6 +75,8 @@ def analisar_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
     except ErroDeteccao as erro:
         deteccoes = []
         resultado = resultado_erro(str(erro))
+    if aviso_execucao:
+        resultado["avisos"].append(aviso_execucao)
     relatorio = montar_relatorio(resultado, config, nota.get("nota_id"), imagem_origem)
     base = desenhar_caixas_embalagem(imagem_bgr, analise_caixas["caixas"]) if analise_caixas else imagem_bgr
     evidencia = montar_evidencia(desenhar_caixas(base, deteccoes, config), relatorio)
@@ -108,8 +111,9 @@ def montar_relatorio(resultado, config, nota_id, imagem_origem):
     }
 
 
-# Conferência completa a partir de arquivos: grava relatorio.json e imagem_anotada.jpg e devolve (relatório, pasta)
-def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, cliente=None, sem_caixas=False):
+# Conferência completa a partir de arquivos: grava relatorio.json, imagem_anotada.jpg e respostas_brutas.json e devolve (relatório, pasta)
+def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, cliente=None, sem_caixas=False,
+             reproduzir=None):
     imagem_origem = Path(caminho_imagem).as_posix()
     pasta = Path(pasta_saida) if pasta_saida else nova_pasta_execucao(caminho_imagem)
     pasta.mkdir(parents=True, exist_ok=True)
@@ -121,15 +125,23 @@ def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, client
             config = config_sem_caixas(config)
         imagem = ler_imagem(caminho_imagem)
         nota = carregar_nota(caminho_nota, config["de_para"])
+        aviso_execucao = None
+        if reproduzir:
+            cliente = ClienteReproducao(carregar_respostas(reproduzir), Path(reproduzir).as_posix())
+            aviso_execucao = (f"Reprodução offline das respostas gravadas em {Path(reproduzir).as_posix()} "
+                              "— não é uma nova inferência")
     except (ErroEntrada, ErroDeteccao) as erro:
         config = config or {}
         relatorio = montar_relatorio(resultado_erro(str(erro)), config, None, imagem_origem)
         base = imagem if imagem is not None else imagem_vazia()
         evidencia = montar_evidencia(desenhar_caixas(base, [], {"limiar_confianca": 1.0}), relatorio)
     else:
+        gravador = ClienteGravador(config, cliente)
         relatorio, evidencia, analise_caixas = analisar_quadro(
-            imagem, nota, config, cliente=cliente, imagem_origem=imagem_origem
+            imagem, nota, config, cliente=gravador, imagem_origem=imagem_origem,
+            aviso_execucao=aviso_execucao,
         )
+        salvar_respostas(pasta, gravador)
         if analise_caixas is not None:
             (pasta / "analise_caixas.json").write_text(
                 json.dumps(analise_caixas, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -163,9 +175,12 @@ def main(argumentos=None):
     parser.add_argument("--json", action="store_true", help="imprime o relatório JSON completo em vez do resumo")
     parser.add_argument("--sem-caixas", action="store_true",
                         help="confere só com o modelo de ferramentas, ignorando modelo_caixas_id do config")
+    parser.add_argument("--reproduzir", metavar="PASTA",
+                        help="usa o respostas_brutas.json de uma execução anterior em vez de chamar o Roboflow")
     args = parser.parse_args(argumentos)
 
-    relatorio, pasta = conferir(args.imagem, args.nota, pasta_saida=args.saida, sem_caixas=args.sem_caixas)
+    relatorio, pasta = conferir(args.imagem, args.nota, pasta_saida=args.saida, sem_caixas=args.sem_caixas,
+                                reproduzir=args.reproduzir)
     if args.json:
         print(json.dumps({**relatorio, "pasta_saida": str(pasta)}, indent=2, ensure_ascii=False))
     else:

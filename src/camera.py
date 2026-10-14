@@ -10,6 +10,7 @@ from PIL import ImageDraw
 from conferir import PASTA_SAIDAS, analisar_quadro, carregar_config, config_sem_caixas, imprimir_resumo
 from caixas import salvar_recortes_internos
 from nota import ErroEntrada, carregar_nota
+from reproducao import ClienteGravador, salvar_respostas
 from visualizacao import bgr_para_pil, carregar_fonte, pil_para_bgr, salvar_jpg
 
 
@@ -49,7 +50,7 @@ def recortar_area(quadro, area=AREA_LEITURA):
     return quadro[y1:y2, x1:x2].copy()
 
 
-# Confere só a área marcada e grava o quadro inteiro, o recorte, relatório e evidência.
+# Confere só a área marcada e grava o quadro inteiro, o recorte, relatório, evidência e respostas brutas.
 def processar_captura(quadro, nota, config, pasta, cliente=None):
     pasta = Path(pasta)
     pasta.mkdir(parents=True, exist_ok=True)
@@ -59,10 +60,12 @@ def processar_captura(quadro, nota, config, pasta, cliente=None):
         salvar_jpg(pasta / "quadro_analisado.jpg", quadro_analisado)
     else:
         quadro_analisado = None
+    gravador = ClienteGravador(config, cliente)
     relatorio, evidencia, analise_caixas = analisar_quadro(
-        quadro_analisado, nota, config, cliente=cliente,
+        quadro_analisado, nota, config, cliente=gravador,
         imagem_origem=str(pasta / "quadro_original.jpg"),
     )
+    salvar_respostas(pasta, gravador)
     if analise_caixas is not None:
         (pasta / "analise_caixas.json").write_text(
             json.dumps(analise_caixas, ensure_ascii=False, indent=2), encoding="utf-8"
