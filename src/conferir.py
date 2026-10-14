@@ -80,6 +80,11 @@ def analisar_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
     return relatorio, evidencia, analise_caixas
 
 
+# Devolve uma cópia do config sem o modelo de caixas, para conferir só com o de ferramentas.
+def config_sem_caixas(config):
+    return {**config, "modelo_caixas_id": None}
+
+
 # Preserva a interface antiga para quem usa só relatório e imagem anotada.
 def conferir_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
     relatorio, evidencia, _ = analisar_quadro(
@@ -104,7 +109,7 @@ def montar_relatorio(resultado, config, nota_id, imagem_origem):
 
 
 # Conferência completa a partir de arquivos: grava relatorio.json e imagem_anotada.jpg e devolve (relatório, pasta)
-def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, cliente=None):
+def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, cliente=None, sem_caixas=False):
     imagem_origem = Path(caminho_imagem).as_posix()
     pasta = Path(pasta_saida) if pasta_saida else nova_pasta_execucao(caminho_imagem)
     pasta.mkdir(parents=True, exist_ok=True)
@@ -112,6 +117,8 @@ def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, client
     imagem = None
     try:
         config = config or carregar_config()
+        if sem_caixas:
+            config = config_sem_caixas(config)
         imagem = ler_imagem(caminho_imagem)
         nota = carregar_nota(caminho_nota, config["de_para"])
     except (ErroEntrada, ErroDeteccao) as erro:
@@ -154,9 +161,11 @@ def main(argumentos=None):
     parser.add_argument("--nota", required=True, help="caminho do JSON da nota fiscal")
     parser.add_argument("--saida", help="pasta de saída (padrão: saidas/<data_hora>_<imagem>)")
     parser.add_argument("--json", action="store_true", help="imprime o relatório JSON completo em vez do resumo")
+    parser.add_argument("--sem-caixas", action="store_true",
+                        help="confere só com o modelo de ferramentas, ignorando modelo_caixas_id do config")
     args = parser.parse_args(argumentos)
 
-    relatorio, pasta = conferir(args.imagem, args.nota, pasta_saida=args.saida)
+    relatorio, pasta = conferir(args.imagem, args.nota, pasta_saida=args.saida, sem_caixas=args.sem_caixas)
     if args.json:
         print(json.dumps({**relatorio, "pasta_saida": str(pasta)}, indent=2, ensure_ascii=False))
     else:

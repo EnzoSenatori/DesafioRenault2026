@@ -7,7 +7,7 @@ from pathlib import Path
 import cv2
 from PIL import ImageDraw
 
-from conferir import PASTA_SAIDAS, analisar_quadro, carregar_config, imprimir_resumo
+from conferir import PASTA_SAIDAS, analisar_quadro, carregar_config, config_sem_caixas, imprimir_resumo
 from caixas import salvar_recortes_internos
 from nota import ErroEntrada, carregar_nota
 from visualizacao import bgr_para_pil, carregar_fonte, pil_para_bgr, salvar_jpg
@@ -143,11 +143,15 @@ def main(argumentos=None):
     parser = argparse.ArgumentParser(description="Confere uma foto capturada pela câmera contra a nota fiscal simulada.")
     parser.add_argument("--nota", required=True, help="caminho do JSON da nota fiscal")
     parser.add_argument("--camera", type=int, default=0, help="índice da câmera (padrão: 0)")
+    parser.add_argument("--sem-caixas", action="store_true",
+                        help="confere só com o modelo de ferramentas, ignorando modelo_caixas_id do config")
     args = parser.parse_args(argumentos)
     if args.camera < 0:
         parser.error("--camera deve ser zero ou um inteiro positivo")
     try:
         config = carregar_config()
+        if args.sem_caixas:
+            config = config_sem_caixas(config)
         nota = carregar_nota(args.nota, config["de_para"])
     except (ErroEntrada, KeyError) as erro:
         print(f"Não foi possível iniciar a câmera: {erro}", file=sys.stderr)

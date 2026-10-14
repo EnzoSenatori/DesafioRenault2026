@@ -140,3 +140,37 @@ def test_cli_codigo_de_saida_em_erro(tmp_path, capsys):
                    "--saida", str(tmp_path / "saida"), "--json"])
     assert codigo == CODIGOS_SAIDA["erro"]
     assert json.loads(capsys.readouterr().out)["status"] == "erro"
+
+
+# Cliente falso que registra quais modelos foram chamados.
+class ClienteRegistraModelos(ClienteDuasChaves):
+    # Guarda o model_id de cada chamada antes de responder.
+    def __init__(self):
+        self.modelos = []
+
+    # Responde como ClienteDuasChaves e registra o modelo.
+    def infer(self, imagem, model_id=None):
+        self.modelos.append(model_id)
+        return super().infer(imagem, model_id)
+
+
+# --sem-caixas confere só com o modelo de ferramentas, sem aviso de caixa nem analise_caixas.json.
+def test_sem_caixas_usa_um_modelo(tmp_path):
+    assert CONFIG.get("modelo_caixas_id")
+    cliente = ClienteRegistraModelos()
+    nota = escrever_nota(tmp_path, 1)
+    relatorio, pasta = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG,
+                                cliente=cliente, sem_caixas=True)
+    assert cliente.modelos == [CONFIG["model_id"]]
+    assert not any("caixa" in aviso.lower() for aviso in relatorio["avisos"])
+    assert not (pasta / "analise_caixas.json").exists()
+    assert CONFIG.get("modelo_caixas_id")
+
+
+# Sem a opção, o config com modelo de caixas continua chamando os dois modelos.
+def test_com_caixas_por_padrao(tmp_path):
+    cliente = ClienteRegistraModelos()
+    nota = escrever_nota(tmp_path, 1)
+    relatorio, pasta = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG, cliente=cliente)
+    assert cliente.modelos[0] == CONFIG["modelo_caixas_id"]
+    assert (pasta / "analise_caixas.json").exists()
