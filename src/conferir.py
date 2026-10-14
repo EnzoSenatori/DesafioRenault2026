@@ -6,8 +6,10 @@ from datetime import datetime
 from pathlib import Path
 
 from comparador import comparar, resultado_erro
+from caixas import desenhar_caixas_embalagem, detectar_caixas_e_produtos, salvar_recortes_internos
 from detector import ErroDeteccao, detectar, ler_imagem
 from nota import ErroEntrada, carregar_nota
+from posprocessamento import consolidar_deteccoes
 from visualizacao import desenhar_caixas, imagem_vazia, montar_evidencia, salvar_jpg
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -38,22 +40,51 @@ def nova_pasta_execucao(caminho_imagem, base=PASTA_SAIDAS):
     return pasta
 
 
-# Roda a conferência num quadro BGR já carregado e numa nota já validada; devolve o relatório e a evidência
-def conferir_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
+# Roda a conferência e devolve também a análise por caixa quando há dois modelos configurados.
+def analisar_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
     if imagem_bgr is None or getattr(imagem_bgr, "ndim", 0) != 3:
         relatorio = montar_relatorio(
             resultado_erro("Quadro vazio ou inválido — confira a câmera ou a imagem enviada"),
             config, nota.get("nota_id"), imagem_origem,
         )
-        return relatorio, montar_evidencia(imagem_vazia(), relatorio)
+        return relatorio, montar_evidencia(imagem_vazia(), relatorio), None
+    analise_caixas = None
+    caixas = []
+    suprimidas = []
     try:
-        deteccoes = detectar(imagem_bgr, config, cliente=cliente)
+        if config.get("modelo_caixas_id"):
+            deteccoes, caixas, analise_caixas = detectar_caixas_e_produtos(
+                imagem_bgr, config, cliente=cliente
+            )
+            suprimidas = analise_caixas["deteccoes_suprimidas"]
+        else:
+            brutas = detectar(imagem_bgr, config, cliente=cliente)
+            deteccoes, suprimidas = consolidar_deteccoes(
+                brutas, imagem_bgr, config["limiar_confianca"]
+            )
         resultado = comparar(nota, deteccoes, config)
+        if config.get("modelo_caixas_id") and not caixas:
+            resultado["avisos"].append(
+                "Nenhuma caixa aberta detectada — as ferramentas foram classificadas como fora da caixa"
+            )
+        if suprimidas:
+            resultado["avisos"].append(
+                f"{len(suprimidas)} detecção(ões) repetida(s) ou fragmentada(s) retirada(s) da contagem"
+            )
     except ErroDeteccao as erro:
         deteccoes = []
         resultado = resultado_erro(str(erro))
     relatorio = montar_relatorio(resultado, config, nota.get("nota_id"), imagem_origem)
-    evidencia = montar_evidencia(desenhar_caixas(imagem_bgr, deteccoes, config), relatorio)
+    base = desenhar_caixas_embalagem(imagem_bgr, analise_caixas["caixas"]) if analise_caixas else imagem_bgr
+    evidencia = montar_evidencia(desenhar_caixas(base, deteccoes, config), relatorio)
+    return relatorio, evidencia, analise_caixas
+
+
+# Preserva a interface antiga para quem usa só relatório e imagem anotada.
+def conferir_quadro(imagem_bgr, nota, config, cliente=None, imagem_origem=None):
+    relatorio, evidencia, _ = analisar_quadro(
+        imagem_bgr, nota, config, cliente=cliente, imagem_origem=imagem_origem
+    )
     return relatorio, evidencia
 
 
@@ -89,7 +120,14 @@ def conferir(caminho_imagem, caminho_nota, pasta_saida=None, config=None, client
         base = imagem if imagem is not None else imagem_vazia()
         evidencia = montar_evidencia(desenhar_caixas(base, [], {"limiar_confianca": 1.0}), relatorio)
     else:
-        relatorio, evidencia = conferir_quadro(imagem, nota, config, cliente=cliente, imagem_origem=imagem_origem)
+        relatorio, evidencia, analise_caixas = analisar_quadro(
+            imagem, nota, config, cliente=cliente, imagem_origem=imagem_origem
+        )
+        if analise_caixas is not None:
+            (pasta / "analise_caixas.json").write_text(
+                json.dumps(analise_caixas, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            salvar_recortes_internos(imagem, analise_caixas, pasta)
 
     with open(pasta / "relatorio.json", "w", encoding="utf-8") as arquivo:
         json.dump(relatorio, arquivo, indent=2, ensure_ascii=False)
