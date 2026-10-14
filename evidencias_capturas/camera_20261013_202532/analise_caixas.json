@@ -1,0 +1,69 @@
+{
+  "modelo_caixas_id": "open-closed-cardbox/2",
+  "modelo_produtos_id": "tool-detection-4u0yd/15",
+  "limiar_confianca": 0.6,
+  "caixas": [],
+  "produtos_fora": [
+    {
+      "classe": "Screwdriver",
+      "confianca": 0.9985976815223694,
+      "caixa_xyxy": [
+        36.0,
+        273.0,
+        472.0,
+        341.0
+      ]
+    },
+    {
+      "classe": "Screwdriver",
+      "confianca": 0.9959110021591187,
+      "caixa_xyxy": [
+        40.0,
+        327.0,
+        468.0,
+        363.0
+      ]
+    },
+    {
+      "classe": "Hammer",
+      "confianca": 0.9942725896835327,
+      "caixa_xyxy": [
+        46.0,
+        0.0,
+        419.0,
+        80.0
+      ]
+    },
+    {
+      "classe": "Hammer",
+      "confianca": 0.9836183190345764,
+      "caixa_xyxy": [
+        64.0,
+        44.0,
+        424.0,
+        149.0
+      ]
+    },
+    {
+      "classe": "Screwdriver",
+      "confianca": 0.9820209741592407,
+      "caixa_xyxy": [
+        35.0,
+        281.0,
+        217.0,
+        321.0
+      ]
+    },
+    {
+      "classe": "Hammer",
+      "confianca": 0.7013805508613586,
+      "caixa_xyxy": [
+        422.0,
+        0.0,
+        480.0,
+        192.0
+      ]
+    }
+  ],
+  "total_produtos": 6
+}

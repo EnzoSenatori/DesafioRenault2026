@@ -1,5 +1,7 @@
 # Conferência visual de ferramentas — MVP do Desafio Renault
 
+> **Registro histórico:** este arquivo descreve a construção inicial. O estado atual, o modelo escolhido por Rafael e o modo câmera estão em `CONTINUIDADE.md` e `README.md`. Em caso de divergência, siga esses documentos e `AGENTS.md`.
+
 Este arquivo orienta o Claude Code na construção do MVP. Leia-o inteiro antes de começar e siga a ordem de implementação, parando nos portões indicados.
 
 ## 1. Contexto
