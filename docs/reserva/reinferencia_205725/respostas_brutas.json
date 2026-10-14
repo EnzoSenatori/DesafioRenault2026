@@ -1,0 +1,108 @@
+{
+  "modelo_id": "tool-detection-4u0yd/15",
+  "modelo_caixas_id": "open-closed-cardbox/2",
+  "chamadas": [
+    {
+      "modelo_id": "open-closed-cardbox/2",
+      "forma_imagem": [
+        365,
+        480,
+        3
+      ],
+      "resposta": {
+        "inference_id": "47e41d51-2604-4479-838e-38a00ca4a8cd",
+        "time": 0.00660400465130806,
+        "resolved_model": {
+          "model_id": "open-closed-cardbox/2",
+          "model_package_id": "341349e9c9f96e1bbe9f80d3dd33e463",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 480,
+          "height": 365
+        },
+        "predictions": [
+          {
+            "x": 239.0,
+            "y": 194.0,
+            "width": 476.0,
+            "height": 342.0,
+            "confidence": 0.747186541557312,
+            "class": "Open Cardboard Box",
+            "class_id": 1,
+            "detection_id": "a2087bfa-e32b-46e3-a665-53f3e53b6b6c"
+          }
+        ]
+      }
+    },
+    {
+      "modelo_id": "tool-detection-4u0yd/15",
+      "forma_imagem": [
+        365,
+        480,
+        3
+      ],
+      "resposta": {
+        "inference_id": "16c5d5b0-2f74-49b4-aa33-524cdb524367",
+        "time": 0.0053098807111382484,
+        "resolved_model": {
+          "model_id": "tool-detection-4u0yd/15",
+          "model_package_id": "d9e17d96240d37f366490718373a0555",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 480,
+          "height": 365
+        },
+        "predictions": [
+          {
+            "x": 257.0,
+            "y": 181.5,
+            "width": 446.0,
+            "height": 349.0,
+            "confidence": 0.8054396510124207,
+            "class": "Mallet",
+            "class_id": 6,
+            "detection_id": "09bcc6c4-7a29-4ba6-8afb-d43627209a2b"
+          }
+        ]
+      }
+    },
+    {
+      "modelo_id": "tool-detection-4u0yd/15",
+      "forma_imagem": [
+        267,
+        476,
+        3
+      ],
+      "resposta": {
+        "inference_id": "0b9048d4-6517-4186-80e8-65ceac271983",
+        "time": 0.005212031304836273,
+        "resolved_model": {
+          "model_id": "tool-detection-4u0yd/15",
+          "model_package_id": "d9e17d96240d37f366490718373a0555",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 476,
+          "height": 267
+        },
+        "predictions": [
+          {
+            "x": 301.5,
+            "y": 133.0,
+            "width": 343.0,
+            "height": 266.0,
+            "confidence": 0.8878485560417175,
+            "class": "Mallet",
+            "class_id": 6,
+            "detection_id": "a675fa1d-6401-49ac-8029-449a13a74757"
+          }
+        ]
+      }
+    }
+  ]
+}

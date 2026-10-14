@@ -133,7 +133,9 @@ Em cada captura, conferir na pasta nova `saidas/camera_<data_hora>/`: `quadro_an
 | `camera_20261013_205632` | Caixa aberta vista lateralmente, martelo parcialmente coberto | `Open Cardboard Box` a 0,34 (abaixo de 0,6); `Hammer` 0,63 e `Mallet` 0,62. |
 | `camera_20261013_205725` | Caixa quase preenchendo o recorte, cabeça do martelo pouco visível | Caixa aceita a 0,75; ferramenta como `Mallet` 0,84; a chave de fenda pedida pela nota não aparece no recorte. O rótulo azul cortado nessa evidência já foi corrigido no código. |
 
-Não apresentar esses três casos como prova de que o recorte interno melhorou a precisão. O registro original está em `docs/passagens/2026-10-13_evidencias_capturas.md`.
+Não apresentar esses três casos como prova de que o recorte interno melhorou a precisão. O registro original está em `docs/passagens/2026-10-13_evidencias_capturas.md`. As fotos completas dessas e das demais capturas ficam no `saidas/` da pasta local de Rafael, ignorado pelo Git; não estão no repositório.
+
+Em 13/10, Enzo repetiu a inferência real sobre os três `quadro_analisado.jpg` com o fluxo atual de dois modelos (são os mesmos quadros, não capturas novas). As respostas estão em `docs/reserva/reinferencia_<captura>/respostas_brutas.json` e se reproduzem sem rede, por exemplo: `src\conferir.py --imagem evidencias_capturas/camera_20261013_205725/quadro_analisado.jpg --nota notas/nota_caixa_aberta_demo.json --reproduzir docs/reserva/reinferencia_205725`. Resultados: `202532` → 3+3 brutos, 1+1 após o filtro, `conforme`; `205632` → caixa 0,36 (não aceita), `Hammer` 0,62 e `Mallet` 0,61 no mesmo objeto, ambos contados, `divergente`; `205725` → caixa aceita 0,75, `Mallet` no quadro geral (0,81) e no recorte interno (0,89), sem chave de fenda, `divergente`.
 
 Uma tentativa de conexão real a partir do ambiente automatizado desta sessão falhou com `HTTPClientError` **também no modelo anterior**, inclusive com o conjunto local de certificados e após liberar acesso à rede. Rafael executou os dois modelos no terminal normal e gerou várias capturas reais. O modelo de caixas aceitou a caixa aberta nas sete últimas; o recorte interno implementado depois ainda não foi testado nessa máquina.
 
@@ -175,7 +177,7 @@ Riscos principais: dupla contagem do martelo (inclusive entre classes, como `Ham
 
 ## Propostas da revisão de 13/10 (aguardando aprovação de Rafael)
 
-Implementadas por Enzo na branch `propostas-revisao-2026-10-13`, um commit por proposta, com testes sem rede (74 testes no total). Nenhuma muda modelo, limiar, classes do `de_para` nem o formato de `relatorio.json`. Rafael pode aceitar, ajustar ou descartar cada uma.
+Implementadas por Enzo na branch `propostas-revisao-2026-10-13`, um commit por proposta, com testes sem rede (74 testes no total). O raciocínio, as medições e as hipóteses estão em `docs/passagens/2026-10-13_revisao_tecnica_enzo.md`; a mensagem a Rafael e o prompt para o Codex dele, em `docs/passagens/2026-10-13_mensagem_para_rafael.md`. Nenhuma muda modelo, limiar, classes do `de_para` nem o formato de `relatorio.json`. Rafael pode aceitar, ajustar ou descartar cada uma.
 
 1. **`--sem-caixas`** em `conferir.py` e `camera.py`: confere só com o modelo de ferramentas sem editar o config. Motivo: com `modelo_caixas_id` ativo, a demonstração por arquivo fazia 2 chamadas e exibia o aviso de caixa ausente. O padrão continua com dois modelos.
 2. **`avaliar_modelos.py --fluxo-real`**: aplica `aliases_classes` e `consolidar_deteccoes` antes de contar. Execução real em 13/10, limiar 0,6: 3/4 exatas, 8 corretos, 0 faltas, 1 excesso, igual ao fluxo bruto.
@@ -184,6 +186,8 @@ Implementadas por Enzo na branch `propostas-revisao-2026-10-13`, um commit por p
 5. **Plano B offline**: cada execução grava `respostas_brutas.json`; `conferir.py --reproduzir PASTA` refaz a conferência a partir dela, sem rede, com aviso no relatório. Os exemplos de `docs/` foram regenerados com 0,6 e `--sem-caixas`, e `docs/reserva/` guarda as respostas dos dois cenários.
 
 Medição de tempo (rede de Enzo, 13/10): chamadas aquecidas de 0,22 a 0,31 s; 2 chamadas em 0,5–0,7 s; 3 chamadas (uma caixa aceita) em 0,78 s; a primeira chamada ao modelo de caixas na sessão levou 4,4 s, provável partida a frio do serviço. Recomendação: uma conferência de aquecimento antes do pitch.
+
+**Lacuna menor:** `modelos_avaliacao.json` não mapeia `Claw hammer` → `Hammer` para o GantrySystem, embora o `config.json` o faça; na avaliação bruta esse nome contaria como classe desconhecida (`--fluxo-real` aplica o alias). Corrigir o mapeamento é simples, mas altera a base de comparação das métricas — decisão de Rafael.
 
 **Ponto aberto, sem implementação:** na captura `205632`, o mesmo martelo saiu como `Hammer` 0,62 e `Mallet` 0,61 quase na mesma posição, e os dois contam; a consolidação só junta detecções da mesma classe. Juntar classes parecidas sobrepostas é decisão de Rafael, porque mexe na distinção entre ferramentas.
 

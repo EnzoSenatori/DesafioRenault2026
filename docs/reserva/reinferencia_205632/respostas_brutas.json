@@ -1,0 +1,124 @@
+{
+  "modelo_id": "tool-detection-4u0yd/15",
+  "modelo_caixas_id": "open-closed-cardbox/2",
+  "chamadas": [
+    {
+      "modelo_id": "open-closed-cardbox/2",
+      "forma_imagem": [
+        365,
+        480,
+        3
+      ],
+      "resposta": {
+        "inference_id": "7e03bfbd-d851-4386-be89-29d21dffef9d",
+        "time": 0.006769934669137001,
+        "resolved_model": {
+          "model_id": "open-closed-cardbox/2",
+          "model_package_id": "341349e9c9f96e1bbe9f80d3dd33e463",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 480,
+          "height": 365
+        },
+        "predictions": [
+          {
+            "x": 239.5,
+            "y": 182.5,
+            "width": 475.0,
+            "height": 365.0,
+            "confidence": 0.3609694242477417,
+            "class": "Open Cardboard Box",
+            "class_id": 1,
+            "detection_id": "53b5cbae-87ea-4032-9874-fabefb2b6014"
+          },
+          {
+            "x": 241.0,
+            "y": 193.0,
+            "width": 478.0,
+            "height": 344.0,
+            "confidence": 0.1702641248703003,
+            "class": "Closed Cardboard Box",
+            "class_id": 0,
+            "detection_id": "148b82e3-e784-4245-89c9-f8e8c76b06fb"
+          }
+        ]
+      }
+    },
+    {
+      "modelo_id": "tool-detection-4u0yd/15",
+      "forma_imagem": [
+        365,
+        480,
+        3
+      ],
+      "resposta": {
+        "inference_id": "f3177b73-364f-4e5a-918b-2183ade156ec",
+        "time": 0.005484783090651035,
+        "resolved_model": {
+          "model_id": "tool-detection-4u0yd/15",
+          "model_package_id": "d9e17d96240d37f366490718373a0555",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 480,
+          "height": 365
+        },
+        "predictions": [
+          {
+            "x": 244.0,
+            "y": 173.0,
+            "width": 466.0,
+            "height": 192.0,
+            "confidence": 0.6187353134155273,
+            "class": "Hammer",
+            "class_id": 4,
+            "detection_id": "88b93806-62c8-43a9-aa7e-1dcef7751927"
+          },
+          {
+            "x": 246.5,
+            "y": 151.0,
+            "width": 467.0,
+            "height": 248.0,
+            "confidence": 0.6081641912460327,
+            "class": "Mallet",
+            "class_id": 6,
+            "detection_id": "6d962854-d6c7-4ca5-863a-f47a8119cb50"
+          },
+          {
+            "x": 242.5,
+            "y": 305.5,
+            "width": 475.0,
+            "height": 119.0,
+            "confidence": 0.4513474106788635,
+            "class": "Hammer",
+            "class_id": 4,
+            "detection_id": "645d41cb-6742-418f-a183-e51934cb39df"
+          },
+          {
+            "x": 230.0,
+            "y": 345.5,
+            "width": 456.0,
+            "height": 37.0,
+            "confidence": 0.3882933259010315,
+            "class": "Mallet",
+            "class_id": 6,
+            "detection_id": "a446fe9f-89a2-49dc-9542-97256b403198"
+          },
+          {
+            "x": 240.0,
+            "y": 60.5,
+            "width": 478.0,
+            "height": 121.0,
+            "confidence": 0.3756680488586426,
+            "class": "Hammer",
+            "class_id": 4,
+            "detection_id": "db0f29cd-b33f-4797-988a-f7041eab3074"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "modelo_id": "tool-detection-4u0yd/15",
+  "modelo_caixas_id": "open-closed-cardbox/2",
+  "chamadas": [
+    {
+      "modelo_id": "open-closed-cardbox/2",
+      "forma_imagem": [
+        365,
+        480,
+        3
+      ],
+      "resposta": {
+        "inference_id": "fafe41d5-84b1-4444-a8d9-52556b1ff2b0",
+        "time": 0.006042758002877235,
+        "resolved_model": {
+          "model_id": "open-closed-cardbox/2",
+          "model_package_id": "341349e9c9f96e1bbe9f80d3dd33e463",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 480,
+          "height": 365
+        },
+        "predictions": []
+      }
+    },
+    {
+      "modelo_id": "tool-detection-4u0yd/15",
+      "forma_imagem": [
+        365,
+        480,
+        3
+      ],
+      "resposta": {
+        "inference_id": "6ab47801-ed17-4801-9890-67e6a38587aa",
+        "time": 0.00725329015403986,
+        "resolved_model": {
+          "model_id": "tool-detection-4u0yd/15",
+          "model_package_id": "d9e17d96240d37f366490718373a0555",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 480,
+          "height": 365
+        },
+        "predictions": [
+          {
+            "x": 254.0,
+            "y": 306.5,
+            "width": 436.0,
+            "height": 69.0,
+            "confidence": 0.9985442161560059,
+            "class": "Screwdriver",
+            "class_id": 12,
+            "detection_id": "80981874-7651-4efb-9653-a6b6071bd966"
+          },
+          {
+            "x": 254.0,
+            "y": 345.5,
+            "width": 428.0,
+            "height": 35.0,
+            "confidence": 0.9958609938621521,
+            "class": "Screwdriver",
+            "class_id": 12,
+            "detection_id": "cde5400a-ca72-4e67-a0ba-0c87e5234937"
+          },
+          {
+            "x": 232.5,
+            "y": 39.5,
+            "width": 371.0,
+            "height": 79.0,
+            "confidence": 0.9943080544471741,
+            "class": "Hammer",
+            "class_id": 4,
+            "detection_id": "45a4eb9b-2199-4df0-9883-289f080fb6cb"
+          },
+          {
+            "x": 244.5,
+            "y": 96.0,
+            "width": 359.0,
+            "height": 104.0,
+            "confidence": 0.9838286638259888,
+            "class": "Hammer",
+            "class_id": 4,
+            "detection_id": "3ee2af00-e7a2-413f-a154-70b627728768"
+          },
+          {
+            "x": 127.0,
+            "y": 300.5,
+            "width": 180.0,
+            "height": 39.0,
+            "confidence": 0.981618344783783,
+            "class": "Screwdriver",
+            "class_id": 12,
+            "detection_id": "28a61853-a93a-4da9-93a3-60c9dad42363"
+          },
+          {
+            "x": 451.5,
+            "y": 96.0,
+            "width": 57.0,
+            "height": 192.0,
+            "confidence": 0.6943864226341248,
+            "class": "Hammer",
+            "class_id": 4,
+            "detection_id": "f7ef4d82-1a79-43ab-8f77-b5552538f28a"
+          }
+        ]
+      }
+    }
+  ]
+}
