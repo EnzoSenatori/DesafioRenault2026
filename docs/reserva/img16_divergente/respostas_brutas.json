@@ -1,0 +1,51 @@
+{
+  "modelo_id": "tool-detection-4u0yd/15",
+  "modelo_caixas_id": null,
+  "imagem_sha256": "74c920b656bfb124d71a0d3c6c2688a465168381bfa5f2776a1950ae38e07fee",
+  "chamadas": [
+    {
+      "modelo_id": "tool-detection-4u0yd/15",
+      "forma_imagem": [
+        554,
+        554,
+        3
+      ],
+      "resposta": {
+        "inference_id": "71d17752-0991-4260-ab2a-e7b7a5babded",
+        "time": 0.00562431663274765,
+        "resolved_model": {
+          "model_id": "tool-detection-4u0yd/15",
+          "model_package_id": "d9e17d96240d37f366490718373a0555",
+          "backend": "onnx",
+          "quantization": "fp32"
+        },
+        "image": {
+          "width": 554,
+          "height": 554
+        },
+        "predictions": [
+          {
+            "x": 318.0,
+            "y": 267.5,
+            "width": 176.0,
+            "height": 423.0,
+            "confidence": 0.9905694723129272,
+            "class": "Pipe Wrench",
+            "class_id": 8,
+            "detection_id": "7cfd5b5d-414d-436b-be48-1793b8a6455d"
+          },
+          {
+            "x": 231.0,
+            "y": 290.5,
+            "width": 214.0,
+            "height": 405.0,
+            "confidence": 0.9888858795166016,
+            "class": "Adjustable Wrench",
+            "class_id": 0,
+            "detection_id": "c11edc4c-5c3e-4db1-981c-84d827a8e58b"
+          }
+        ]
+      }
+    }
+  ]
+}

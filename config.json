@@ -1,18 +1,31 @@
 {
-  "model_id": "tools-classification-byznk/2",
+  "model_id": "tool-detection-4u0yd/15",
+  "modelo_caixas_id": "open-closed-cardbox/2",
+  "classes_caixas": ["Open Cardboard Box"],
   "api_url": "https://serverless.roboflow.com",
-  "limiar_confianca": 0.5,
-  "classes_ignoradas": ["Fasteners"],
+  "limiar_confianca": 0.6,
+  "classes_ignoradas": [],
+  "aliases_classes": {
+    "Adjustable Wrench": "Wrench",
+    "Pipe Wrench": "PipeWrench",
+    "Flat Head Screwdriver": "Screwdriver",
+    "Philips Screwdriver": "Screwdriver",
+    "Claw hammer": "Hammer"
+  },
   "de_para": {
     "FER-001": "Pliers",
     "FER-002": "Screwdriver",
     "FER-003": "Wrench",
-    "FER-004": "Hammer"
+    "FER-004": "Hammer",
+    "FER-005": "PipeWrench"
   },
   "nomes_exibicao": {
     "Pliers": "Alicate",
     "Screwdriver": "Chave de fenda",
-    "Wrench": "Chave inglesa",
-    "Hammer": "Martelo"
+    "Wrench": "Chave inglesa ajustável",
+    "Hammer": "Martelo",
+    "PipeWrench": "Chave de grifo",
+    "Mallet": "Marreta",
+    "Tape Measure": "Trena"
   }
 }

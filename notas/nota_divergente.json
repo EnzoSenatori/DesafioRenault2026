@@ -2,6 +2,6 @@
   "nota_id": "NF-DEMO-002",
   "fornecedor": "Fornecedor Exemplo Ltda.",
   "itens": [
-    {"codigo": "FER-003", "descricao": "Chave inglesa ajustável", "quantidade": 2}
+    {"codigo": "FER-003", "descricao": "Chave inglesa ajustável", "quantidade": 1}
   ]
 }

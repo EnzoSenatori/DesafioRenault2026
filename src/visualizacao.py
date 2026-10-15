@@ -6,6 +6,7 @@ CORES_CLASSE = {
     "Pliers": (230, 120, 0),
     "Screwdriver": (0, 140, 230),
     "Wrench": (150, 60, 200),
+    "PipeWrench": (255, 170, 0),
     "Hammer": (210, 40, 40),
 }
 COR_PADRAO = (255, 170, 0)

@@ -64,11 +64,11 @@ def criar_cliente(config):
     return cliente
 
 
-# Roda o modelo num quadro BGR e devolve as detecções no formato interno
-def detectar(imagem_bgr, config, cliente=None):
+# Roda o modelo indicado num quadro BGR e devolve as detecções no formato interno.
+def detectar(imagem_bgr, config, cliente=None, modelo_id=None, aliases=None):
     try:
         cliente = cliente or criar_cliente(config)
-        resposta = cliente.infer(imagem_bgr, model_id=config["model_id"])
+        resposta = cliente.infer(imagem_bgr, model_id=modelo_id or config["model_id"])
     except ErroDeteccao:
         raise
     except HTTPCallErrorError as erro:
@@ -79,4 +79,8 @@ def detectar(imagem_bgr, config, cliente=None):
         raise ErroDeteccao(
             f"Falha na chamada ao Roboflow ({type(erro).__name__}) — verifique a internet ou use a saída de reserva"
         )
-    return converter_resposta(resposta)
+    deteccoes = converter_resposta(resposta)
+    aliases = config.get("aliases_classes", {}) if aliases is None else aliases
+    for deteccao in deteccoes:
+        deteccao["classe"] = aliases.get(deteccao["classe"], deteccao["classe"])
+    return deteccoes

@@ -1,0 +1,54 @@
+{
+  "modelo_caixas_id": "open-closed-cardbox/2",
+  "modelo_produtos_id": "tool-detection-4u0yd/15",
+  "limiar_confianca": 0.6,
+  "caixas": [],
+  "produtos_fora": [
+    {
+      "classe": "Mallet",
+      "confianca": 0.6192349195480347,
+      "caixa_xyxy": [
+        12.0,
+        26.0,
+        480.0,
+        274.0
+      ]
+    },
+    {
+      "classe": "Hammer",
+      "confianca": 0.6277170777320862,
+      "caixa_xyxy": [
+        11.0,
+        76.0,
+        477.0,
+        268.0
+      ]
+    }
+  ],
+  "total_produtos": 2,
+  "caixas_ignoradas": [
+    {
+      "classe": "Open Cardboard Box",
+      "confianca": 0.3395124673843384,
+      "caixa_xyxy": [
+        2.0,
+        0.0,
+        476.0,
+        365.0
+      ],
+      "motivo": "abaixo_do_limiar"
+    },
+    {
+      "classe": "Closed Cardboard Box",
+      "confianca": 0.21000182628631592,
+      "caixa_xyxy": [
+        1.0,
+        29.0,
+        480.0,
+        365.0
+      ],
+      "motivo": "abaixo_do_limiar"
+    }
+  ],
+  "deteccoes_suprimidas": []
+}

@@ -1,0 +1,54 @@
+{
+  "nota_id": "NF-CAMERA-CAIXA-ABERTA",
+  "imagem": "evidencias_capturas/camera_20261013_205632/quadro_analisado.jpg",
+  "status": "divergente",
+  "linhas": [
+    {
+      "codigo": "FER-004",
+      "item": "Martelo",
+      "classe": "Hammer",
+      "esperado": 1,
+      "detectado": 1,
+      "delta": 0,
+      "situacao": "igual"
+    },
+    {
+      "codigo": "FER-002",
+      "item": "Chave de fenda",
+      "classe": "Screwdriver",
+      "esperado": 1,
+      "detectado": 0,
+      "delta": -1,
+      "situacao": "falta"
+    },
+    {
+      "codigo": null,
+      "item": "Mallet",
+      "classe": "Mallet",
+      "esperado": 0,
+      "detectado": 1,
+      "delta": 1,
+      "situacao": "nao_previsto"
+    }
+  ],
+  "descartadas": [
+    {
+      "classe": "Hammer",
+      "confianca": 0.468
+    },
+    {
+      "classe": "Hammer",
+      "confianca": 0.378
+    },
+    {
+      "classe": "Mallet",
+      "confianca": 0.362
+    }
+  ],
+  "avisos": [
+    "Nenhuma caixa aberta detectada — as ferramentas foram classificadas como fora da caixa"
+  ],
+  "modelo_id": "tool-detection-4u0yd/15",
+  "limiar_confianca": 0.6,
+  "gerado_em": "2026-10-13T20:56:32-03:00"
+}

@@ -1,0 +1,30 @@
+{
+  "nota_id": "NF-CAMERA-CAIXA-ABERTA",
+  "imagem": "evidencias_capturas/camera_20261013_202532/quadro_analisado.jpg",
+  "status": "divergente",
+  "linhas": [
+    {
+      "codigo": "FER-004",
+      "item": "Martelo",
+      "classe": "Hammer",
+      "esperado": 1,
+      "detectado": 3,
+      "delta": 2,
+      "situacao": "excesso"
+    },
+    {
+      "codigo": "FER-002",
+      "item": "Chave de fenda",
+      "classe": "Screwdriver",
+      "esperado": 1,
+      "detectado": 3,
+      "delta": 2,
+      "situacao": "excesso"
+    }
+  ],
+  "descartadas": [],
+  "avisos": [],
+  "modelo_id": "tool-detection-4u0yd/15",
+  "limiar_confianca": 0.6,
+  "gerado_em": "2026-10-13T20:25:33-03:00"
+}

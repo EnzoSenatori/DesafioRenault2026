@@ -28,6 +28,30 @@ class ClienteSemRede:
         raise ConnectionError("sem rede")
 
 
+# Simula as duas classes distintas devolvidas pelo modelo adotado.
+class ClienteDuasChaves:
+    # Devolve uma inglesa ajustável e uma chave de grifo.
+    def infer(self, imagem, model_id=None):
+        return {"predictions": [
+            {"x": 180, "y": 290, "width": 120, "height": 400,
+             "confidence": 0.99, "class": "Adjustable Wrench"},
+            {"x": 330, "y": 290, "width": 120, "height": 400,
+             "confidence": 0.99, "class": "Pipe Wrench"},
+        ]}
+
+
+# Simula o martelo verdadeiro e a falsa chave de fenda observados na webcam.
+class ClienteLimiarCamera:
+    # Devolve pontuações em lados opostos do limiar escolhido por Rafael.
+    def infer(self, imagem, model_id=None):
+        return {"predictions": [
+            {"x": 180, "y": 290, "width": 120, "height": 400,
+             "confidence": 0.73, "class": "Hammer"},
+            {"x": 330, "y": 290, "width": 120, "height": 400,
+             "confidence": 0.52, "class": "Screwdriver"},
+        ]}
+
+
 # Grava uma nota temporária e devolve o caminho
 def escrever_nota(pasta, quantidade):
     caminho = pasta / "nota.json"
@@ -39,7 +63,8 @@ def escrever_nota(pasta, quantidade):
 
 # Verifica: conforme gera relatório e imagem
 def test_conforme_gera_relatorio_e_imagem(tmp_path):
-    relatorio, pasta = conferir(IMAGEM, escrever_nota(tmp_path, 1), tmp_path / "saida", CONFIG, ClienteFalso())
+    config = {**CONFIG, "classes_ignoradas": ["Fasteners"]}
+    relatorio, pasta = conferir(IMAGEM, escrever_nota(tmp_path, 1), tmp_path / "saida", config, ClienteFalso())
     assert relatorio["status"] == "conforme"
     assert relatorio["descartadas"] == [{"classe": "Hammer", "confianca": 0.2}]
     assert (pasta / "imagem_anotada.jpg").stat().st_size > 0
@@ -54,6 +79,26 @@ def test_divergente(tmp_path):
     relatorio, _ = conferir(IMAGEM, escrever_nota(tmp_path, 2), tmp_path / "saida", CONFIG, ClienteFalso())
     assert relatorio["status"] == "divergente"
     assert relatorio["linhas"][0]["situacao"] == "falta"
+
+
+# A nota de uma inglesa aponta a chave de grifo adicional como não prevista.
+def test_modelo_novo_distingue_os_tipos_de_chave(tmp_path):
+    relatorio, _ = conferir(IMAGEM, escrever_nota(tmp_path, 1), tmp_path / "saida", CONFIG, ClienteDuasChaves())
+    assert relatorio["status"] == "divergente"
+    linhas = {linha["classe"]: linha for linha in relatorio["linhas"]}
+    assert linhas["Wrench"]["situacao"] == "igual"
+    assert linhas["PipeWrench"]["situacao"] == "nao_previsto"
+    assert linhas["PipeWrench"]["codigo"] == "FER-005"
+
+
+# O limiar 0,60 preserva o martelo 0,73 e descarta o falso positivo 0,52.
+def test_limiar_escolhido_para_camera(tmp_path):
+    nota = RAIZ / "notas" / "nota_martelo_camera.json"
+    relatorio, _ = conferir(IMAGEM, nota, tmp_path / "saida", CONFIG, ClienteLimiarCamera())
+    assert CONFIG["limiar_confianca"] == 0.6
+    assert relatorio["status"] == "conforme"
+    assert [(linha["classe"], linha["detectado"]) for linha in relatorio["linhas"]] == [("Hammer", 1)]
+    assert relatorio["descartadas"] == [{"classe": "Screwdriver", "confianca": 0.52}]
 
 
 # Verifica: falha de rede vira erro, nunca conforme
@@ -95,3 +140,58 @@ def test_cli_codigo_de_saida_em_erro(tmp_path, capsys):
                    "--saida", str(tmp_path / "saida"), "--json"])
     assert codigo == CODIGOS_SAIDA["erro"]
     assert json.loads(capsys.readouterr().out)["status"] == "erro"
+
+
+# Cliente falso que registra quais modelos foram chamados.
+class ClienteRegistraModelos(ClienteDuasChaves):
+    # Guarda o model_id de cada chamada antes de responder.
+    def __init__(self):
+        self.modelos = []
+
+    # Responde como ClienteDuasChaves e registra o modelo.
+    def infer(self, imagem, model_id=None):
+        self.modelos.append(model_id)
+        return super().infer(imagem, model_id)
+
+
+# --sem-caixas confere só com o modelo de ferramentas, sem aviso de caixa nem analise_caixas.json.
+def test_sem_caixas_usa_um_modelo(tmp_path):
+    assert CONFIG.get("modelo_caixas_id")
+    cliente = ClienteRegistraModelos()
+    nota = escrever_nota(tmp_path, 1)
+    relatorio, pasta = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG,
+                                cliente=cliente, sem_caixas=True)
+    assert cliente.modelos == [CONFIG["model_id"]]
+    assert not any("caixa" in aviso.lower() for aviso in relatorio["avisos"])
+    assert not (pasta / "analise_caixas.json").exists()
+    assert CONFIG.get("modelo_caixas_id")
+
+
+# Sem a opção, o config com modelo de caixas continua chamando os dois modelos.
+def test_com_caixas_por_padrao(tmp_path):
+    cliente = ClienteRegistraModelos()
+    nota = escrever_nota(tmp_path, 1)
+    relatorio, pasta = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG, cliente=cliente)
+    assert cliente.modelos[0] == CONFIG["modelo_caixas_id"]
+    assert (pasta / "analise_caixas.json").exists()
+
+
+# Simula a marreta e a trena que o modelo devolve fora do de_para.
+class ClienteMarretaTrena:
+    # Devolve classes sem código na nota, como nas capturas da webcam.
+    def infer(self, imagem, model_id=None):
+        return {"predictions": [
+            {"x": 180, "y": 290, "width": 120, "height": 400, "confidence": 0.84, "class": "Mallet"},
+            {"x": 330, "y": 290, "width": 120, "height": 400, "confidence": 0.91, "class": "Tape Measure"},
+        ]}
+
+
+# Marreta e trena aparecem em português, continuam sem código e não viram martelo.
+def test_classes_fora_do_de_para_em_portugues(tmp_path):
+    nota = escrever_nota(tmp_path, 1)
+    relatorio, _ = conferir(IMAGEM, nota, pasta_saida=tmp_path / "saida", config=CONFIG,
+                            cliente=ClienteMarretaTrena(), sem_caixas=True)
+    linhas = {linha["classe"]: linha for linha in relatorio["linhas"]}
+    assert linhas["Mallet"]["item"] == "Marreta" and linhas["Mallet"]["codigo"] is None
+    assert linhas["Tape Measure"]["item"] == "Trena" and linhas["Tape Measure"]["situacao"] == "nao_previsto"
+    assert "Hammer" not in linhas and "Mallet" not in CONFIG["de_para"].values()

@@ -1,0 +1,8 @@
+{
+  "nota_id": "NF-CAMERA-CAIXA-ABERTA",
+  "fornecedor": "Demonstração da câmera",
+  "itens": [
+    {"codigo": "FER-004", "descricao": "Martelo", "quantidade": 1},
+    {"codigo": "FER-002", "descricao": "Chave de fenda", "quantidade": 1}
+  ]
+}
